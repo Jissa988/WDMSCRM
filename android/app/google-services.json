@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "141938700569",
+    "project_id": "wdmscustomerportal",
+    "storage_bucket": "wdmscustomerportal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141938700569:android:0b3047ffe3cbfb94b55588",
+        "android_client_info": {
+          "package_name": "com.example.customer_portal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFm3B9WttySFbG_hDGtxJ8RI5RBqoEMN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
