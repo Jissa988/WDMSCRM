@@ -79,10 +79,13 @@ class _SalesListState extends State<_SalesList> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    double height=size.height;
+    double headerHeight=size.height/3;
+    double containerHeight=height-headerHeight;
     return FutureBuilder(
         future: salesProvider.getSalesList(
             _token,
-            2,
+            widget.customerDetails!.finyearId,
             widget.customerDetails!.customerId,
             _startDate.toString(),
             _endDate.toString()),
@@ -108,6 +111,7 @@ class _SalesListState extends State<_SalesList> {
             return WillPopScope(
               onWillPop: () async => false,
               child: Scaffold(
+                backgroundColor: AppColors.white,
                 resizeToAvoidBottomInset: false,
                 body: SizedBox(
                   width: size.width,
@@ -189,7 +193,7 @@ class _SalesListState extends State<_SalesList> {
                                     color: AppColors.white,
                                     size: 16,
                                   ),
-                                  SizedBox(width: 8),
+                                  SizedBox(width: 5),
                                   Expanded(
                                     child: Align(
                                       alignment: Alignment.bottomLeft,
@@ -210,88 +214,104 @@ class _SalesListState extends State<_SalesList> {
                               ),
 
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(width: 30),
-                                  Icon(
-                                    Icons.check,
-                                    color: AppColors.white,
-                                    size: 16,
-                                  ),
-                                  SizedBox(width: 8),
                                   Expanded(
-                                    child: Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Text(
-                                        ' Paid - ${salesProvider.invoiceCount[0].paidCount}',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Metropolis',
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(width: 30),
+                                            Icon(
+                                              Icons.check,
+                                              color: AppColors.white,
+                                              size: 16,
+                                            ),
+                                            SizedBox(width: 5),
+                                            Flexible(child:
+                                            Text(
+                                              'Paid - ${salesProvider.invoiceCount[0].paidCount}',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'Metropolis',
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
+
+                                      ],
                                     ),
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Row(children: [
+                                          // SizedBox(width: 30),
+                                          Icon(
+                                            Icons.close,
+                                            color: AppColors.white,
+                                            size: 16,
+                                          ),
+                                          SizedBox(width: 5),
+                                          Flexible(child:
+                                          Text(
+                                            'Unpaid - ${salesProvider.invoiceCount[0].upaidCount}',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: 'Metropolis',
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          ),],)
+
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child:
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Row(children: [
+                                      // SizedBox(width: 30),
+                                      Icon(
+                                        Icons.radio_button_unchecked,
+                                        color: AppColors.white,
+                                        size: 16,
+                                      ),
+                                      SizedBox(width: 5),
+                                     Flexible(child:
+                                     Text('Partial - ${salesProvider.invoiceCount[0].patialCount} ',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: 'Metropolis',
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                     ),
+                                    ],)
+
+                                    ],
+                                  ),
                                   ),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(width: 30),
-                                  Icon(
-                                    Icons.close,
-                                    color: AppColors.white,
-                                    size: 16,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    child: Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Text(
-                                        ' Unpaid - ${salesProvider.invoiceCount[0].upaidCount}',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Metropolis',
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(width: 30),
-                                  Icon(
-                                    Icons.radio_button_unchecked,
-                                    color: AppColors.white,
-                                    size: 16,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    child: Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: Text(
-                                        ' Partial Paid - ${salesProvider.invoiceCount[0].patialCount} ',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Metropolis',
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+
+
+
+                          ],
                           ),
+
+
                         ),
                       ),
                       salesProvider.salesInvoice.isNotEmpty
@@ -335,7 +355,7 @@ class _SalesListState extends State<_SalesList> {
                               left: 16,
                               child: Container(
                                 width: size.width - 32,
-                                height: 120,
+                                height: size.height / 3,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.horizontal(
@@ -343,37 +363,31 @@ class _SalesListState extends State<_SalesList> {
                                     right: Radius.circular(10),
                                   ),
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Card(
-                                    color: AppColors.white,
-                                    elevation: 2,
-                                    shadowColor: AppColors.theme_color,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        10,
+                                child:Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Padding(padding: EdgeInsets.only(bottom:15 ),
+                                        child:
+                                      Image.asset(
+                                        'assets/quickAlerts/lightbulb.gif',
+                                        // width: 500,
+                                        // height: 100,
                                       ),
-                                    ),
-                                    child: ListTile(
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                          vertical: 5,
-                                          horizontal: 16,
+                                      ),
+                                      Text(
+                                        'Data Not Found',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontFamily: 'Metropolis',
+                                          color: AppColors.theme_color,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        // minLeadingWidth: task.isDone ? 0 : 2,
-                                        title: Center(
-                                          child: Text(
-                                            'Data Not Found',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontFamily: 'Metropolis',
-                                              color: AppColors.theme_color,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        )),
+                                      ),
+                                    ],
                                   ),
                                 ),
+
                               ),
                             )
                     ],

@@ -6,7 +6,7 @@ class Materials {
   final String materialIssueDate;
   final String docDate;
   final String ownership;
-  final int qty;
+  final double qty;
   final String unit;
   final double price;
   final double amount;

@@ -48,106 +48,106 @@ class AppSizes {
   static const tile_width = 148.0;
   static const tile_height = 276.0;
 }
-class CustomerPortalTheme {
-  static ThemeData of(BuildContext context) {
-    var theme = Theme.of(context);
-    // var textScaleFactor = MediaQuery.of(context).textScaleFactor;
-
-    // Define themeColorText style
-
-
-    return theme.copyWith(
-      primaryColor: AppColors.black,
-      primaryColorLight: AppColors.lightGray,
-      bottomAppBarColor: AppColors.lightGray,
-      backgroundColor: AppColors.background,
-      dialogBackgroundColor: AppColors.backgroundLight,
-      errorColor: AppColors.red,
-      dividerColor: Colors.transparent,
-      appBarTheme: theme.appBarTheme.copyWith(
-        color: AppColors.white,
-        iconTheme: IconThemeData(color: AppColors.black),
-      ),
-      textTheme: TextTheme(
-        headline1: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 20 ,
-          fontWeight: FontWeight.bold,
-          color: AppColors.black,
-        ),
-        headline2: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 18 ,
-          fontWeight: FontWeight.w500,
-          color: AppColors.black,
-        ),
-        headline3: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 16 ,
-          fontWeight: FontWeight.w500,
-          color: AppColors.black,
-        ),
-        headline4: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 12 ,
-          fontWeight: FontWeight.w500,
-          color: AppColors.black,
-        ),
-        headline5: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 10 ,
-          fontWeight: FontWeight.w500,
-          color: AppColors.black,
-        ),
-        headline6: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 10 ,
-          fontWeight: FontWeight.normal,
-          color: AppColors.lightGray,
-        ),
-        subtitle1: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 14 ,
-          fontWeight: FontWeight.bold,
-          fontStyle: FontStyle.italic,
-          color: AppColors.lightGray,
-        ),
-        subtitle2: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 10 ,
-          fontWeight: FontWeight.normal,
-          color: AppColors.black,
-        ),
-
-        bodyText1: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: AppColors.theme_color,
-        ),
-        bodyText2: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 16 ,
-          fontWeight: FontWeight.w500,
-          color: AppColors.theme_color,
-        ),
-        button: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 14 ,
-          fontWeight: FontWeight.w500,
-          color: AppColors.white,
-        ),
-        caption: TextStyle(
-          fontFamily: 'Metropolis',
-          fontSize: 34 ,
-          fontWeight: FontWeight.w700,
-          color: AppColors.black,
-        ),
-      ),
-      buttonTheme: theme.buttonTheme.copyWith(
-        minWidth: 50 ,
-        buttonColor: AppColors.red,
-      ),
-    );
-  }
-}
+// class CustomerPortalTheme {
+//   static ThemeData of(BuildContext context) {
+//     var theme = Theme.of(context);
+//     // var textScaleFactor = MediaQuery.of(context).textScaleFactor;
+//
+//     // Define themeColorText style
+//
+//
+//     return theme.copyWith(
+//       primaryColor: AppColors.black,
+//       primaryColorLight: AppColors.lightGray,
+//       bottomAppBarColor: AppColors.lightGray,
+//       backgroundColor: AppColors.background,
+//       dialogBackgroundColor: AppColors.backgroundLight,
+//       errorColor: AppColors.red,
+//       dividerColor: Colors.transparent,
+//       appBarTheme: theme.appBarTheme.copyWith(
+//         color: AppColors.white,
+//         iconTheme: IconThemeData(color: AppColors.black),
+//       ),
+//       textTheme: TextTheme(
+//         headline1: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 20 ,
+//           fontWeight: FontWeight.bold,
+//           color: AppColors.black,
+//         ),
+//         headline2: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 18 ,
+//           fontWeight: FontWeight.w500,
+//           color: AppColors.black,
+//         ),
+//         headline3: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 16 ,
+//           fontWeight: FontWeight.w500,
+//           color: AppColors.black,
+//         ),
+//         headline4: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 12 ,
+//           fontWeight: FontWeight.w500,
+//           color: AppColors.black,
+//         ),
+//         headline5: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 10 ,
+//           fontWeight: FontWeight.w500,
+//           color: AppColors.black,
+//         ),
+//         headline6: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 10 ,
+//           fontWeight: FontWeight.normal,
+//           color: AppColors.lightGray,
+//         ),
+//         subtitle1: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 14 ,
+//           fontWeight: FontWeight.bold,
+//           fontStyle: FontStyle.italic,
+//           color: AppColors.lightGray,
+//         ),
+//         subtitle2: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 10 ,
+//           fontWeight: FontWeight.normal,
+//           color: AppColors.black,
+//         ),
+//
+//         bodyText1: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 22,
+//           fontWeight: FontWeight.bold,
+//           color: AppColors.theme_color,
+//         ),
+//         bodyText2: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 16 ,
+//           fontWeight: FontWeight.w500,
+//           color: AppColors.theme_color,
+//         ),
+//         button: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 14 ,
+//           fontWeight: FontWeight.w500,
+//           color: AppColors.white,
+//         ),
+//         caption: TextStyle(
+//           fontFamily: 'Metropolis',
+//           fontSize: 34 ,
+//           fontWeight: FontWeight.w700,
+//           color: AppColors.black,
+//         ),
+//       ),
+//       buttonTheme: theme.buttonTheme.copyWith(
+//         minWidth: 50 ,
+//         buttonColor: AppColors.red,
+//       ),
+//     );
+//   }
+// }

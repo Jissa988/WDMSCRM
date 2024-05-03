@@ -20,8 +20,9 @@ class ProductDataTable extends StatelessWidget {
     return Container(
       child: Column(children: [
       DataTable(
+        dataRowHeight: 60,
       columns: [
-        DataColumn(label:Expanded( child: Text('Item',style:
+        DataColumn(label:Flexible( child: Text('Item',style:
           TextStyle(
             fontSize: 15,
             fontFamily: 'Metropolis',
@@ -48,7 +49,8 @@ class ProductDataTable extends StatelessWidget {
         ),))),
       ],
       rows: productList.map((product) {
-        return DataRow(cells: [
+        return DataRow(
+            cells: [
           DataCell(Text(product.itemName,style:
           TextStyle(
             fontSize: 15,
@@ -92,7 +94,7 @@ class ProductDataTable extends StatelessWidget {
             ),
 
             Text(
-              '${sales!.netAmount}',
+              '${sales!.totalwithoutTax} AED',
               style: TextStyle(
                 color: AppColors.black,
                 fontSize: 20,
@@ -118,7 +120,7 @@ class ProductDataTable extends StatelessWidget {
           ),
 
           Text(
-            '${sales!.totalwithoutTax}',
+            '${sales!.taxamount} AED',
             style: TextStyle(
               color: AppColors.black,
               fontSize: 20,

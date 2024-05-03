@@ -243,7 +243,7 @@ class ProfileProvider extends ChangeNotifier {
       // Handle response
       var response = await http.Response.fromStream(streamedResponse);
       print('response--$response');
-
+      print('response--${response.statusCode}');
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
         print('responseBody--$responseBody');
@@ -318,7 +318,8 @@ class ProfileProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> imageView(String token, String fileName) async {
+  Future<void> imageView( String fileName) async {
+    print("imageView--" + fileName);
     try {
       var request = http.MultipartRequest(
         'POST',
@@ -328,7 +329,7 @@ class ProfileProvider extends ChangeNotifier {
       request.fields['FileName'] = fileName;
 
       // Add token if needed
-      request.headers['Authorization'] = 'Bearer $token';
+      // request.headers['Authorization'] = 'Bearer $token';
 
       // Send the request
       var streamedResponse = await request.send();

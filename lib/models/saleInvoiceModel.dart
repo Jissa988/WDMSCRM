@@ -130,12 +130,13 @@ class SalesItem {
 }
 class InvoiceCount{
 final int paidCount;
-final int upaidCount;
 final int patialCount;
+final int upaidCount;
+
 
 InvoiceCount(
 this.paidCount,
-    this.upaidCount,
     this.patialCount,
+    this.upaidCount,
 );
 }

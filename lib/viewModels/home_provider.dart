@@ -13,10 +13,12 @@ class HomeProvider extends ChangeNotifier {
   int _recId = 0;
   int _status = 0;
   String _msg = '';
+  int _statusCode=0;
 
   int get accessToken => _recId;
   int get status => _status;
   String get msg => _msg;
+  int get statusCode=>_statusCode;
 
   List<CustomerAccouts> _customerAccounts = [];
   CustomerAccouts? _selected_customerAccounts;
@@ -46,7 +48,7 @@ class HomeProvider extends ChangeNotifier {
         },
       );
     logger.i("response--${response}");
-    logger.i("response--${response.statusCode}");
+    logger.i("response----statusCode---${response.statusCode}");
       if (response.statusCode == 200) { // Check if the response status code is 200 (OK)
         final List<dynamic> data = response.data['ResultSet']; // Access response.data instead of response
         _customerAccounts = data.map((item) => CustomerAccouts(item['CustomerId'], item['CustomerName'])).toList();
@@ -69,7 +71,10 @@ class HomeProvider extends ChangeNotifier {
   }
   List<HomeEmployeeDetails> homeEmployeeDetails = [];
 
-
+  void updateHomeEmployeeDetails(List<HomeEmployeeDetails> details) {
+    homeEmployeeDetails = details;
+    notifyListeners(); // Notify listeners about the change
+  }
 
   Future<void> getHome(String token,int customerId) async {
     try {
@@ -91,17 +96,6 @@ class HomeProvider extends ChangeNotifier {
       if (response.statusCode == 200) { // Check if the response status code is 200 (OK)
         final List<dynamic> data = response.data['ResultSet'];
         List<HomeEmployeeDetails> _homeEmployeeDetails = data.map((item) {
-
-          DateTime? lastsaledatetime;
-
-          // if (item['Lastsaledatetime'] != null) {
-          //   try {
-          //     lastsaledatetime = DateTime.parse(item['Lastsaledatetime']);
-          //   } catch (e) {
-          //     print("Failed to parse Lastsaledatetime: $e");
-          //     lastsaledatetime = null;
-          //   }
-          // }
 
           return HomeEmployeeDetails(
             item['CustomerId'] ?? 0,
@@ -126,14 +120,19 @@ class HomeProvider extends ChangeNotifier {
             item['LastCollectionAmount'] ?? 0.0,
             item['UnseenNotificationCount']?? 0,
             item['FinYearId']?? 0,
+            item['FilePath']?? "",
+            item['FileName']?? "",
+            item['LastDOdatetime']?? "",
+            item['ThisMonthDOAmount']?? 0.0,
           );
         }).toList();
 
 
         homeEmployeeDetails.clear();
         homeEmployeeDetails.addAll(_homeEmployeeDetails);
+     updateHomeEmployeeDetails(_homeEmployeeDetails); // Update HomeProvider with the fetched data
 
-        notifyListeners();
+        notifyListeners(); // Notify listeners about the change
       }
       else {
         throw Exception('Failed to load data');
@@ -161,14 +160,14 @@ class HomeProvider extends ChangeNotifier {
         final List<dynamic> data = response.data['ResultSet'];
         print('response--$data');
         unSeenNotification = data.map((item) => UnSeenNotification(
-          item['NotificationId'],
-          item['Type'],
-          item['CustomerId'],
-          item['TransactionHeadId'],
-          item['TypeId'],
-          item['TransactionDocNo'],
-          item['AMOUNT'],
-          item['FinYearId'],
+          item['NotificationId']?? 0,
+          item['Type']?? "",
+          item['TypeId']?? 0,
+          item['CustomerId']?? 0,
+          item['TransactionHeadId']?? 0,
+          item['TransactionDocNo']?? "",
+          item['AMOUNT']?? 0.0,
+          item['FinYearId']?? 0,
 
         )).toList();
         notifyListeners();
@@ -182,10 +181,10 @@ class HomeProvider extends ChangeNotifier {
   }
   Future<void> notificationSeenUpdation(String token, int? notificationId) async {
     try {
-      logger.i("updateNotificationStatus--");
+      logger.i("updateNotificationStatus--$token");
       logger.i("notificationId--$notificationId");
-
-
+      logger.i("base--${ApiConfig.getBaseUrl('base')}");
+      logger.i("api--${ApiEndpoints.notificationStatusUpdation}");
       final Response<dynamic> response = await _dio.post(
         '${ApiConfig.getBaseUrl('base')}${ApiEndpoints.notificationStatusUpdation}',
 

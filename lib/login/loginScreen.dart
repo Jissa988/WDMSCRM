@@ -11,169 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../viewModels/registeration_provider.dart';
 
-// class LoginScreen extends StatelessWidget {
-//   const LoginScreen({Key? key}) : super(key: key);
-//
-//   @override
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: RippleEffect(
-//         pulsations: 2.2,
-//         dampening: .958,
-//         child: Container(
-//           width: double.infinity,
-//           color: AppColors.theme_color,
-//           // decoration: BoxDecoration(
-//           //   image: DecorationImage(image: AssetImage('assets/login/login_background.jpg'), fit: BoxFit.cover),
-//           // ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 
-// import 'dart:async';
-//
-//
-// class LoginScreen extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Water Ripples Effect',
-//       home: Scaffold(
-//         body: WaterRipplesEffect(),
-//       ),
-//     );
-//   }
-// }
-//
-// class WaterRipplesEffect extends StatefulWidget {
-//   @override
-//   _WaterRipplesEffectState createState() => _WaterRipplesEffectState();
-// }
-//
-// class _WaterRipplesEffectState extends State<WaterRipplesEffect> {
-//   List<Ripple> _ripples = [];
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onTapDown: (details) {
-//         _addRipple(details.localPosition);
-//       },
-//       onPanUpdate: (details) {
-//         _addRipple(details.localPosition);
-//       },
-//       child: Stack(
-//         children: [
-//           Container(
-//             decoration: BoxDecoration(
-//               image: DecorationImage(
-//                 image: AssetImage('assets/login/login_background.jpg'),
-//                 fit: BoxFit.cover,
-//               ),
-//             ),
-//           ),
-//           for (var ripple in _ripples) ripple,
-//         ],
-//       ),
-//     );
-//   }
-//
-//   void _addRipple(Offset position) {
-//     setState(() {
-//       _ripples.add(Ripple(position: position));
-//     });
-//   }
-// }
-//
-// class Ripple extends StatefulWidget {
-//   final Offset position;
-//
-//   const Ripple({required this.position});
-//
-//   @override
-//   _RippleState createState() => _RippleState();
-// }
-//
-// class _RippleState extends State<Ripple> with TickerProviderStateMixin {
-//   late AnimationController _controller;
-//   late Animation<double> _animation;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     _controller = AnimationController(
-//       vsync: this,
-//       duration: Duration(milliseconds: 700),
-//     );
-//     _animation = Tween<double>(begin: 0, end: 1).animate(
-//       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-//     )..addListener(() {
-//       setState(() {});
-//     });
-//     _controller.forward();
-//     _controller.addStatusListener((status) {
-//       if (status == AnimationStatus.completed) {
-//         setState(() {
-//           _controller.reset();
-//         });
-//       }
-//     });
-//     Timer.periodic(Duration(milliseconds: 750), (_) {
-//       if (mounted) _controller.forward(from: 0);
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return CustomPaint(
-//       painter: _RipplePainter(animationValue: _animation.value),
-//       child: SizedBox(
-//         width: 100,
-//         height: 100,
-//         child: Center(
-//           child: Container(
-//             width: 50,
-//             height: 50,
-//             decoration: BoxDecoration(
-//               shape: BoxShape.circle,
-//               color: Colors.white,
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-// }
-//
-// class _RipplePainter extends CustomPainter {
-//   final double animationValue;
-//
-//   const _RipplePainter({required this.animationValue});
-//
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     final paint = Paint()
-//       ..color = Colors.blueAccent.withOpacity(0.3 - animationValue * 0.3)
-//       ..style = PaintingStyle.fill;
-//
-//     final radius = size.width * 0.5 * animationValue;
-//     canvas.drawCircle(size.center(Offset.zero), radius, paint);
-//   }
-//
-//   @override
-//   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-//     return true;
-//   }
-// }
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -373,67 +211,70 @@ class _LoginScreenState extends State<_LoginScreen> with WidgetsBindingObserver 
                           ),
                           // Forgot password
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start, // Align children at the start of the cross axis
                             children: [
-                              Container(
-                                alignment: Alignment.centerRight,
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 10),
-                                child: GestureDetector(
-                                  onTap: () => {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => RegisterScreen(),
-                                        settings: RouteSettings(
-                                          arguments: {'isRegister': 0},
+                              Expanded(
+                                child: Container(
+                                  alignment: Alignment.centerRight,
+                                  margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                                  child: GestureDetector(
+                                    onTap: () => {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => RegisterScreen(),
+                                          settings: RouteSettings(
+                                            arguments: {'isRegister': 0},
+                                          ),
                                         ),
+                                      )
+                                    },
+                                    child: Text(
+                                      "Forgot your user name?",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.theme_color,
+                                        fontFamily: 'Metropolis',
                                       ),
-                                    )
-                                  },
-                                  child: Text(
-                                    "Forgot your user name?",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.theme_color,
-                                      fontFamily: 'Metropolis',
                                     ),
                                   ),
                                 ),
                               ),
-                              Spacer(),
-                              Container(
-                                alignment: Alignment.centerRight,
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 10),
-                                child: GestureDetector(
-                                  onTap: () => {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => RegisterScreen(),
-                                        settings: RouteSettings(
-                                          arguments: {'isRegister': 1},
+                              Expanded(
+                                child: Container(
+                                  alignment: Alignment.centerRight,
+                                  margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                                  child: GestureDetector(
+                                    onTap: () => {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => RegisterScreen(),
+                                          settings: RouteSettings(
+                                            arguments: {'isRegister': 1},
+                                          ),
                                         ),
+                                      )
+                                    },
+                                    child: Text(
+                                      "Forgot your password?",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.theme_color,
+                                        fontFamily: 'Metropolis',
                                       ),
-                                    )
-                                  },
-                                  child: Text(
-                                    "Forgot your password?",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.theme_color,
-                                      fontFamily: 'Metropolis',
                                     ),
                                   ),
                                 ),
                               ),
                             ],
                           ),
+
                           // Login button
                           Container(
-                            alignment: Alignment.centerRight,
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 40, vertical: 10),
+                            alignment: Alignment.center,
+                            // margin: EdgeInsets.symmetric(
+                            //     horizontal: 40, vertical: 10),
                             child: ElevatedButton(
                               onPressed: () {
                                 // Validate the form
@@ -446,8 +287,8 @@ class _LoginScreenState extends State<_LoginScreen> with WidgetsBindingObserver 
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(80.0),
                                 ),
-                                primary: AppColors
-                                    .theme_color, // Set the button's background color
+                                backgroundColor: AppColors.theme_color, // Set the button's background color
+
                               ),
                               child: Container(
                                 alignment: Alignment.center,
@@ -510,16 +351,16 @@ class _LoginScreenState extends State<_LoginScreen> with WidgetsBindingObserver 
               'Powered by Sevion Technologies',
               // Replace with your actual version number
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppColors.bs_teal,
-                fontFamily: 'Metropolis',
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic,
-                fontSize: 16.0,
-                decoration: TextDecoration.none,
+              style:
+                TextStyle(
+                  fontSize: 12,
+                  color: AppColors.theme_color,
+                  fontFamily: 'Metropolis',
+                  decoration: TextDecoration.none,
+                ),
               ),
             ),
-          ),
+
           Positioned(
             bottom: 20 + bottomPadding,
             left: 0,

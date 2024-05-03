@@ -93,9 +93,10 @@ class BottleDetails extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   DataCell(
                     Text(
-                      item.bottleType.toString()=="Deposit"?item.qty.toString():"0",
+                      item.bottleType.toString()=="Custody"?item.qty.toString():"0",
                       style: TextStyle(
                         fontSize: 15,
                         fontFamily: 'Metropolis',
@@ -105,7 +106,7 @@ class BottleDetails extends StatelessWidget {
                   ),
                   DataCell(
                     Text(
-                      item.bottleType.toString()=="Custody"?item.qty.toString():"0",
+                      item.bottleType.toString()=="Deposit"?item.qty.toString():"0",
                       style: TextStyle(
                         fontSize: 15,
                         fontFamily: 'Metropolis',

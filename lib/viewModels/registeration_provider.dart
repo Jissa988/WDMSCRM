@@ -30,6 +30,7 @@ class RegisterProvider extends ChangeNotifier {
     try {
 
       logger.i("mobileNo--$mobileNo");
+      logger.i("sendOtp--${ApiConfig.getBaseUrl('base')}");
 
       final Response<dynamic> response = await _dio.post(
         '${ApiConfig.getBaseUrl('base')}${ApiEndpoints.getRegisterOtp}',
@@ -65,16 +66,18 @@ class RegisterProvider extends ChangeNotifier {
   }
   Future<void> resentsendOtpforRegisterAndUserName(String mobileNo,String otpType) async {
     try {
-
+      logger.i("resentsendOtpforRegisterAndUserName-----");
       logger.i("mobileNo--$mobileNo");
+      logger.i("otpType--$otpType");
 
       final Response<dynamic> response = await _dio.post(
         '${ApiConfig.getBaseUrl('base')}${ApiEndpoints.getResentOtpForRegisterOtpandUseName}',
         // Replace with your API endpoint
         data: {
-          "OTPType":otpType,
-          'MobileNo':mobileNo,
-        },
+          "OTPType": '$otpType',
+          "MobileNo": '$mobileNo'
+
+      },
       );
       logger.i("response--${response}");
       logger.i("response--${response.statusCode}");
@@ -186,7 +189,7 @@ class RegisterProvider extends ChangeNotifier {
   }
   Future<void> resendforgotPasswordOtp(String userName) async {
     try {
-
+      logger.i("resendforgotPasswordOtp-----");
       logger.i("userName--$userName");
 
       final Response<dynamic> response = await _dio.post(
@@ -194,7 +197,8 @@ class RegisterProvider extends ChangeNotifier {
         // Replace with your API endpoint
         data: {
           "OTPType": "FPQ",
-          'UserName':userName,
+          'UserName':'$userName',
+
         },
       );
       logger.i("response--${response}");
@@ -351,7 +355,7 @@ class RegisterProvider extends ChangeNotifier {
 
       logger.i("userName--$userName");
       logger.i("password--$password");
-      logger.i("token--$token");
+      logger.i("fcmtoken--$token");
 
 
 

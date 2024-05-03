@@ -90,7 +90,9 @@ class _ProfileEditState extends State<_ProfileEdit> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async => false,
+    child: Scaffold(
       appBar: AppBar(
         title: const Text("Profile Edit"),
         leading: GestureDetector(
@@ -298,6 +300,6 @@ class _ProfileEditState extends State<_ProfileEdit> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

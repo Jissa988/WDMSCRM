@@ -77,6 +77,7 @@ class _SalesDetailsState extends State<_SalesDetails> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    print('SalesDetails---');
 
     return FutureBuilder(
         future:widget.headType=="Sale"? salesProvider.getSalesDetails(
@@ -87,7 +88,8 @@ class _SalesDetailsState extends State<_SalesDetails> {
 
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(
+            return
+              Scaffold(
                 // Wrap the CircularProgressIndicator with a Scaffold
                 backgroundColor: Colors.white,
                 // Set the background color to white
@@ -104,7 +106,9 @@ class _SalesDetailsState extends State<_SalesDetails> {
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
-            return Scaffold(
+            return  WillPopScope(
+                onWillPop: () async => false,
+          child: Scaffold(
               backgroundColor: AppColors.white,
               appBar: AppBar(
                 title: Text(
@@ -144,7 +148,7 @@ class _SalesDetailsState extends State<_SalesDetails> {
                     ),
 
                     Text(
-                      'Date : ${salesProvider.salesHeadItems[0].invoiceDate}',
+                      'Date : ${salesProvider.salesHeadItems[0].invoiceDate} ${salesProvider.salesHeadItems[0].invoiceTime}',
                       style: TextStyle(
                         color: AppColors.black,
                         fontSize: 20,
@@ -208,7 +212,7 @@ class _SalesDetailsState extends State<_SalesDetails> {
                   ],
                 ),
               ),
-            );
+            ));
           }
         });
   }

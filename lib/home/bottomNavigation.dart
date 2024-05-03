@@ -146,7 +146,7 @@ class _BottomNavigationMenuState extends State<BottomNavigationMenu> {
                   title,
                   style: TextStyle(
                     fontFamily: 'Metropolis',
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: colorByIndex(context, index),
                   ),
