@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_logs/flutter_logs.dart';
+// import 'package:flutter_logs/flutter_logs.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase/firebase.dart';
@@ -36,47 +36,47 @@ void configureNotificationChannel() async {
       ?.createNotificationChannel(channel);
 }
 
-Future<void> initLogs() async {
-  await FlutterLogs.initLogs(
-      logLevelsEnabled: [
-        LogLevel.INFO,
-        LogLevel.WARNING,
-        LogLevel.ERROR,
-        LogLevel.SEVERE,
-      ],
-      timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
-      directoryStructure: DirectoryStructure.FOR_DATE,
-      logTypesEnabled: [_myLogFileName],
-      logFileExtension: LogFileExtension.LOG,
-      logsWriteDirectoryName: "MyLogs",
-      logsExportDirectoryName: "MyLogs/Exported",
-      debugFileOperations: true,
-      isDebuggable: true);
-
-  // [IMPORTANT] The first log line must never be called before 'FlutterLogs.initLogs'
-  FlutterLogs.logInfo(_tag, "setUpLogs", "Setting up logs..");
-
-  // Logs Exported Callback
-  FlutterLogs.channel.setMethodCallHandler((call) async {
-    if (call.method == 'logsExported') {
-      // Contains file name of zip
-      FlutterLogs.logInfo(
-          _tag, "setUpLogs", "logsExported: ${call.arguments.toString()}");
-
-      setLogsStatus(
-          status: "logsExported: ${call.arguments.toString()}", append: true);
-
-      // Notify Future with value
-      _completer.complete(call.arguments.toString());
-    } else if (call.method == 'logsPrinted') {
-      FlutterLogs.logInfo(
-          _tag, "setUpLogs", "logsPrinted: ${call.arguments.toString()}");
-
-      setLogsStatus(
-          status: "logsPrinted: ${call.arguments.toString()}", append: true);
-    }
-  });
-}
+// Future<void> initLogs() async {
+//   await FlutterLogs.initLogs(
+//       logLevelsEnabled: [
+//         LogLevel.INFO,
+//         LogLevel.WARNING,
+//         LogLevel.ERROR,
+//         LogLevel.SEVERE,
+//       ],
+//       timeStampFormat: TimeStampFormat.TIME_FORMAT_READABLE,
+//       directoryStructure: DirectoryStructure.FOR_DATE,
+//       logTypesEnabled: [_myLogFileName],
+//       logFileExtension: LogFileExtension.LOG,
+//       logsWriteDirectoryName: "MyLogs",
+//       logsExportDirectoryName: "MyLogs/Exported",
+//       debugFileOperations: true,
+//       isDebuggable: true);
+//
+//   // [IMPORTANT] The first log line must never be called before 'FlutterLogs.initLogs'
+//   FlutterLogs.logInfo(_tag, "setUpLogs", "Setting up logs..");
+//
+//   // Logs Exported Callback
+//   FlutterLogs.channel.setMethodCallHandler((call) async {
+//     if (call.method == 'logsExported') {
+//       // Contains file name of zip
+//       FlutterLogs.logInfo(
+//           _tag, "setUpLogs", "logsExported: ${call.arguments.toString()}");
+//
+//       setLogsStatus(
+//           status: "logsExported: ${call.arguments.toString()}", append: true);
+//
+//       // Notify Future with value
+//       _completer.complete(call.arguments.toString());
+//     } else if (call.method == 'logsPrinted') {
+//       FlutterLogs.logInfo(
+//           _tag, "setUpLogs", "logsPrinted: ${call.arguments.toString()}");
+//
+//       setLogsStatus(
+//           status: "logsPrinted: ${call.arguments.toString()}", append: true);
+//     }
+//   });
+// }
 
 void setLogsStatus({String status = '', bool append = false}) {
   logStatus = status;
@@ -92,7 +92,7 @@ void main() async {
 
   debugProfileBuildsEnabled = true;
   WidgetsFlutterBinding.ensureInitialized();
-  initLogs(); // Use initLogs directly without FlutterLogs prefix
+  // initLogs(); // Use initLogs directly without FlutterLogs prefix
   configureNotificationChannel();
 
   await Firebase.initializeApp();

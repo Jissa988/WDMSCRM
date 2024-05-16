@@ -13,10 +13,12 @@ class HomeProvider extends ChangeNotifier {
   int _recId = 0;
   int _status = 0;
   String _msg = '';
+  int _statusCode=0;
 
   int get accessToken => _recId;
   int get status => _status;
   String get msg => _msg;
+  int get statusCode=>_statusCode;
 
   List<CustomerAccouts> _customerAccounts = [];
   CustomerAccouts? _selected_customerAccounts;
@@ -46,7 +48,7 @@ class HomeProvider extends ChangeNotifier {
         },
       );
     logger.i("response--${response}");
-    logger.i("response--${response.statusCode}");
+    logger.i("response----statusCode---${response.statusCode}");
       if (response.statusCode == 200) { // Check if the response status code is 200 (OK)
         final List<dynamic> data = response.data['ResultSet']; // Access response.data instead of response
         _customerAccounts = data.map((item) => CustomerAccouts(item['CustomerId'], item['CustomerName'])).toList();

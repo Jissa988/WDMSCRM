@@ -241,6 +241,7 @@ if(widget.fileName.isNotEmpty) {
     print("message--" + profileProvider.msg);
     if (profileProvider.stringstatus == 'Success') {
       print("message--" + profileProvider.msg);
+      print("message--" + profileProvider.filePath);
       profileProvider.saveProfileimage(
           widget.token, widget!.customerId, profileProvider.filePath,
           profileProvider.fileName)
@@ -305,16 +306,16 @@ if(widget.fileName.isNotEmpty) {
       } else {
         // Show login failure message
         print("message--" + profileProvider.msg);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "${profileProvider.msg}",
-              style: TextStyle(fontFamily: 'Metropolis'),
-            ),
-            duration: Duration(seconds: 2),
-            backgroundColor: Colors.red[700],
-          ),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text(
+        //       "${profileProvider.msg}",
+        //       style: TextStyle(fontFamily: 'Metropolis'),
+        //     ),
+        //     duration: Duration(seconds: 2),
+        //     backgroundColor: Colors.red[700],
+        //   ),
+        // );
         return null;
       }
     } catch (e) {

@@ -355,7 +355,7 @@ class RegisterProvider extends ChangeNotifier {
 
       logger.i("userName--$userName");
       logger.i("password--$password");
-      logger.i("token--$token");
+      logger.i("fcmtoken--$token");
 
 
 
