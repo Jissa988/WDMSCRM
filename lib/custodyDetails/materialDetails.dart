@@ -125,31 +125,19 @@ class MaterialDetails extends StatelessWidget {
                       ),
                     ),
                     DataCell(
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.docDate.toString(),
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontFamily: 'Metropolis',
-                              color: Colors.black,
-                            ),
-                          ),
-                          // Text(
-                          //   item.docTime.toString(),
-                          //   style: TextStyle(
-                          //     fontSize: 15,
-                          //     fontFamily: 'Metropolis',
-                          //     color: Colors.black,
-                          //   ),
-                          // ),
-                        ],
+                      Text(
+                        item.docDate.toString(),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'Metropolis',
+                          color: Colors.black,
+                        ),
                       ),
                     ),
+
                     DataCell(
                       Text(
-                        item.ownership.toString() == "Custody" ? item.qty.toString() : "0",
+                        item.trxType.toString() == "Issue" ? item.qty.toString() : "0",
                         style: TextStyle(
                           fontSize: 15,
                           fontFamily: 'Metropolis',
@@ -159,7 +147,7 @@ class MaterialDetails extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        item.ownership.toString() == "Deposit" ? item.qty.toString() : "0",
+                        item.trxType.toString() == "Return" ? item.qty.toString() : "0",
                         style: TextStyle(
                           fontSize: 15,
                           fontFamily: 'Metropolis',
@@ -169,7 +157,7 @@ class MaterialDetails extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        item.ownership.toString() == "Deposit" ? item.totalAmount.toString() : "0",
+                        item.bottleType.toString() == "D " ? item.amount.toString() : "0",
                         style: TextStyle(
                           fontSize: 15,
                           fontFamily: 'Metropolis',

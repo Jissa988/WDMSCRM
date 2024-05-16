@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:customer_portal/config/themes.dart';
+import 'package:customer_portal/profile/profile.dart';
 import 'package:customer_portal/viewModels/profile_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class ProfilePic extends StatefulWidget {
 class _ProfilePicState extends State<ProfilePic> {
   PickedFile? _imageFile;
   final ImagePicker _picker = ImagePicker();
+  bool _isTakingPhoto = false; // Track whether photo is being taken
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +40,8 @@ class _ProfilePicState extends State<ProfilePic> {
           FutureBuilder<Uint8List?>(
             future: widget.fileName != '' ? getImage() : Future.value(null),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+              if (snapshot.connectionState == ConnectionState.waiting ||  _isTakingPhoto) {
+                return CircularProgressIndicator(color: AppColors.theme_color,);
               } else {
                 if (snapshot.hasError) {
                   return CircleAvatar(
@@ -138,6 +140,10 @@ class _ProfilePicState extends State<ProfilePic> {
     );
   }
   void takePhoto(ImageSource source,) async {
+    setState(() {
+      _isTakingPhoto = true; // Set state to indicate photo is being taken
+    });
+
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
 print('pickedFile--${pickedFile.path}');
@@ -167,10 +173,21 @@ if(widget.fileName.isNotEmpty) {
             print("message--" + profileProvider.msg);
             if (profileProvider.status == 1) {
               print("message--" + profileProvider.msg);
-
               setState(() {
-                _imageFile = PickedFile(pickedFile.path);
+                _isTakingPhoto = false;
+                Navigator.pop(context);// Set state to indicate photo is being taken
               });
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ProfileScreen(),
+
+                ),
+              );
+
+
             } else {
               // Show login failure message
               print("message--" + profileProvider.msg);
@@ -277,7 +294,7 @@ if(widget.fileName.isNotEmpty) {
     ProfileProvider profileProvider = Provider.of<ProfileProvider>(context, listen: false);
 
     try {
-      await profileProvider.imageView(widget.token, widget.fileName);
+      await profileProvider.imageView( widget.fileName);
       print(profileProvider.stringstatus);
       print("message--" + profileProvider.msg);
       if (profileProvider.stringstatus == 'Success') {

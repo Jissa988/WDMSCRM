@@ -5,7 +5,6 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 import '../constant/string.dart';
-import 'background.dart';
 import 'loginScreen.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -29,7 +28,7 @@ class RegisterScreen extends StatelessWidget {
 }
 
 class _RegisterScreen extends StatefulWidget {
-  int? isRegisteration;
+  int? isRegisteration;// userName=0,passward=1,register=2
 
   _RegisterScreen({required this.isRegisteration});
 
@@ -137,7 +136,7 @@ class _RegisterScreenState extends State<_RegisterScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    var _theme = CustomerPortalTheme.of(context);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -242,7 +241,12 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                         contentPadding: EdgeInsets.only(
                             bottom: 8.0), // Adjust label position when focused
                       ),
-                      style: _theme.textTheme.headline3,
+                      style:  TextStyle(
+          fontFamily: 'Metropolis',
+          fontSize: 16 ,
+          fontWeight: FontWeight.w500,
+          color: AppColors.black,
+        ),
                       validator: (value) {
                         if (widget.isRegisteration == 2 ||
                             widget.isRegisteration == 0) {
@@ -492,7 +496,12 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                               bottom:
                                   8.0), // Adjust label position when focused
                         ),
-                        style: _theme.textTheme.headline3,
+                        style:  TextStyle(
+          fontFamily: 'Metropolis',
+          fontSize: 16 ,
+          fontWeight: FontWeight.w500,
+          color: AppColors.black,
+        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return MyStrings.errorUsername;
@@ -538,7 +547,12 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                               bottom:
                                   8.0), // Adjust label position when focused
                         ),
-                        style: _theme.textTheme.headline3,
+                        style:  TextStyle(
+          fontFamily: 'Metropolis',
+          fontSize: 16 ,
+          fontWeight: FontWeight.w500,
+          color: AppColors.black,
+        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return MyStrings.errorPassword;
@@ -584,7 +598,12 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                               bottom:
                                   8.0), // Adjust label position when focused
                         ),
-                        style: _theme.textTheme.headline3,
+                        style:  TextStyle(
+          fontFamily: 'Metropolis',
+          fontSize: 16 ,
+          fontWeight: FontWeight.w500,
+          color: AppColors.black,
+        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return MyStrings.errorConfirmPassword;
@@ -597,8 +616,9 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                     ),
                   ),
                   Container(
-                    alignment: Alignment.centerRight,
-                    margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+                    alignment: Alignment.center,
+                    margin: EdgeInsets.only(top:15),
+                    // margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
                     child: ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
@@ -621,8 +641,8 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(80.0),
                         ),
-                        primary: AppColors
-                            .theme_color, // Set the button's background color
+                        backgroundColor: AppColors.theme_color, // Set the button's background color
+
                       ),
                       child: Container(
                         alignment: Alignment.center,
@@ -661,9 +681,11 @@ class _RegisterScreenState extends State<_RegisterScreen> {
                       child: Text(
                         "Already Have an Account? Sign in",
                         style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2661FA)),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.theme_color,
+                          fontFamily: 'Metropolis',
+                        ),
                       ),
                     ),
                   )
@@ -786,7 +808,7 @@ class _RegisterScreenState extends State<_RegisterScreen> {
             },
           );
           isResendOtp=true;// Set isLoading to false after sending OTP
-
+          isResendLoading=false;
         } else {
           // Show login failure message
           print("message--" + registerProvider.msg);
@@ -821,6 +843,7 @@ class _RegisterScreenState extends State<_RegisterScreen> {
     } finally {
       setState(() {
         isResendOtp = false;
+        isResendLoading=false;
       });
     }
   }
@@ -931,7 +954,7 @@ class _RegisterScreenState extends State<_RegisterScreen> {
             },
           );
           isResendOtp=true;// Set isLoading to false after sending OTP
-
+          isResendLoading=false;
         } else {
           // Show login failure message
           print("message--" + registerProvider.msg);
@@ -966,6 +989,7 @@ class _RegisterScreenState extends State<_RegisterScreen> {
     } finally {
       setState(() {
         isResendOtp = false; // Set isLoading to false after sending OTP
+        isResendLoading=false;
       });
     }
   }

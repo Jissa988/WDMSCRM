@@ -90,7 +90,7 @@ class _FormWidgetState extends State<FormWidget> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              primary: const Color(0xff2da9ef),
+              backgroundColor: const Color(0xff2da9ef),
             ),
             onPressed: () {
               Navigator.of(context).pop();

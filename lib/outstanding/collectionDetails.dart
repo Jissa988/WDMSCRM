@@ -100,7 +100,9 @@ class _CollectionDetailsState extends State<_CollectionDetails> {
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
-            return Scaffold(
+            return  WillPopScope(
+                onWillPop: () async => false,
+            child:  Scaffold(
               appBar: AppBar(
                 title: Text(
                   'Receipt Voucher',
@@ -202,7 +204,7 @@ class _CollectionDetailsState extends State<_CollectionDetails> {
                   ],
                 ),
               ),
-            );
+            ));
           }
         });
   }

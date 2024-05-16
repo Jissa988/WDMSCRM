@@ -8,13 +8,14 @@ class ProfileMenu extends StatelessWidget {
     Key? key,
     required this.textEditingController,
     required this.icon,
+     required this.type,
      required this.isobstruct,
      required this.placeholder,
      this.onChanged, this.press,
   }) : super(key: key);
 
   final TextEditingController textEditingController;
-  String icon,placeholder;
+  String icon,placeholder,type;
   bool isobstruct;
   final VoidCallback? press;
    final ValueChanged<String>? onChanged;
@@ -45,6 +46,8 @@ class ProfileMenu extends StatelessWidget {
                 controller: textEditingController, // Use a TextEditingController to control the text input
                obscureText: isobstruct,
                 cursorColor: AppColors.theme_color,
+                keyboardType: type=='N'? TextInputType.phone:TextInputType.text,
+
                 decoration: InputDecoration(
                   hintText: placeholder,
                   // Placeholder text

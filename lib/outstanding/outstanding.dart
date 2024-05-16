@@ -11,6 +11,8 @@ import 'package:customer_portal/constant/extensions.dart';
 
 import '../config/themes.dart';
 import '../constant/constants.dart';
+import '../customised/quickAlerts/quickAlertDialogue.dart';
+import '../customised/quickAlerts/quickAlertType.dart';
 import '../home/homePage.dart';
 import '../models/homeModel.dart';
 
@@ -18,22 +20,19 @@ class Outstanding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic>? arguments =
-    ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
     final HomeEmployeeDetails? customerDetails =
-    arguments?['homeDetails'] as HomeEmployeeDetails?;
+        arguments?['homeDetails'] as HomeEmployeeDetails?;
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => OutstandingProvider()),
         // Add other providers if needed
       ],
-      child: _Outstanding(
-          customerDetails: customerDetails
-      ),
+      child: _Outstanding(customerDetails: customerDetails),
     );
   }
 }
-
 
 class _Outstanding extends StatefulWidget {
   HomeEmployeeDetails? customerDetails;
@@ -84,10 +83,13 @@ class _OutstandingState extends State<_Outstanding>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DefaultTabController(
-        length: 2, // Define the number of tabs
-        child: Scaffold(
+    return  WillPopScope(
+        onWillPop: () async => false,
+        child:
+        DefaultTabController(
+            length: 2,
+            child: Scaffold(
+          backgroundColor: AppColors.white,
           appBar: AppBar(
             flexibleSpace: Container(
               decoration: BoxDecoration(
@@ -148,7 +150,7 @@ class _OutstandingState extends State<_Outstanding>
               },
               labelStyle: TextStyle(
                 color: AppColors.white,
-                fontSize: 22,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
               indicatorColor: AppColors.white,
@@ -163,11 +165,12 @@ class _OutstandingState extends State<_Outstanding>
               ],
             ),
           ),
-          body: TabBarView(
+          body:
+          TabBarView(
             children: [
               // Content of Tab 1
 
-              FutureBuilder(
+          FutureBuilder(
                 future: outstandingProvider.getOutstandings(
                     _token, widget.customerDetails!.customerId),
                 builder: (context, snapshot) {
@@ -186,20 +189,98 @@ class _OutstandingState extends State<_Outstanding>
                     return Text('Error: ${snapshot.error}');
                   } else {
                     // Add return statement here
-                    return outstandingProvider.outstandings.isNotEmpty
-                        ? Center(
+                    if (outstandingProvider.outstandings.isNotEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: ListView.separated(
+                            padding: EdgeInsets.zero,
+                            itemBuilder: (context, index) {
+                              return OutstandingList(
+                                outstandings:
+                                    outstandingProvider.outstandings[index],
+                              );
+                            },
+                            itemCount: outstandingProvider.outstandings.length,
+                            separatorBuilder: (context, index) {
+                              return const SizedBox(
+                                height: 4,
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    } else {
+                      return
+                        Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(padding: EdgeInsets.only(right: 25,left: 25,bottom:15 ),child:
+                            Image.asset(
+                              'assets/quickAlerts/lightbulb.gif',
+                              // width: 500,
+                              // height: 100,
+                            ),
+                            ),
+                            Text(
+                              'Data Not Found',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'Metropolis',
+                                color: AppColors.theme_color,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
+
+          FutureBuilder(
+                future: outstandingProvider.getCollectionList(
+                    _token,
+                    widget.customerDetails!.customerId,
+                    _startDate.toString(),
+                    _endDate.toString(),
+                    widget.customerDetails!.finyearId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: AppColors.theme_color,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    // Add return statement here
+
+                    if (outstandingProvider.collections.isNotEmpty) {
+                      return Column(
+                        children: [
+                          Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8),
                               child: ListView.separated(
                                 padding: EdgeInsets.zero,
                                 itemBuilder: (context, index) {
-                                  return OutstandingList(
-                                    outstandings:
-                                        outstandingProvider.outstandings[index],
+                                  return CollectionList(
+                                    collections:
+                                        outstandingProvider.collections[index],
+                                    homeDetails: widget.customerDetails,
                                   );
                                 },
                                 itemCount:
-                                    outstandingProvider.outstandings.length,
+                                    outstandingProvider.collections.length,
                                 separatorBuilder: (context, index) {
                                   return const SizedBox(
                                     height: 4,
@@ -207,150 +288,46 @@ class _OutstandingState extends State<_Outstanding>
                                 },
                               ),
                             ),
-                          )
-                        : Container(
-                            height: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(10),
-                                right: Radius.circular(10),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(padding: EdgeInsets.only(right: 25,left: 25,bottom:15 ),child:
+                            Image.asset(
+                              'assets/quickAlerts/lightbulb.gif',
+                              // width: 500,
+                              // height: 100,
+                            ),
+                            ),
+                            Text(
+                              'Data Not Found',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'Metropolis',
+                                color: AppColors.theme_color,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Card(
-                                color: AppColors.white,
-                                elevation: 2,
-                                shadowColor: AppColors.theme_color,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    10,
-                                  ),
-                                ),
-                                child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5,
-                                      horizontal: 16,
-                                    ),
-                                    // minLeadingWidth: task.isDone ? 0 : 2,
-                                    title: Center(
-                                      child: Text(
-                                        'Data Not Found',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Metropolis',
-                                          color: AppColors.theme_color,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    )),
-                              ),
-                            ),
-                          );
+                          ],
+                        ),
+                      );// Return an empty SizedBox as a placeholder
+                    }
                   }
                 },
               ),
-              FutureBuilder(
-                  future: outstandingProvider.getCollectionList(
-                      _token,
-                      widget.customerDetails!.customerId,
-                      _startDate.toString(),
-                      _endDate.toString(),
-                      3),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: AppColors.theme_color,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      // Add return statement here
-
-                      return outstandingProvider.collections.isNotEmpty
-                          ? Column(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: ListView.separated(
-                                      padding: EdgeInsets.zero,
-                                      itemBuilder: (context, index) {
-                                        return CollectionList(
-                                          collections: outstandingProvider
-                                              .collections[index],
-                                          homeDetails:widget.customerDetails,
-                                        );
-                                      },
-                                      itemCount: outstandingProvider
-                                          .collections.length,
-                                      separatorBuilder: (context, index) {
-                                        return const SizedBox(
-                                          height: 4,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : SizedBox(
-                        height: 20, // Fixed height
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.horizontal(
-                              left: Radius.circular(10),
-                              right: Radius.circular(10),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Card(
-                              color: AppColors.white,
-                              elevation: 2,
-                              shadowColor: AppColors.theme_color,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 5,
-                                  horizontal: 16,
-                                ),
-                                title: Center(
-                                  child: Text(
-                                    'Data Not Found',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: 'Metropolis',
-                                      color: AppColors.theme_color,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-
-                    }
-                  }),
             ],
           ),
         ),
-      ),
+      )
     );
+
   }
+
+
 
   Future<void> _selectDateRange(BuildContext context) async {
     DateTime? startDate = _startDate;

@@ -1,24 +1,14 @@
 import 'dart:async';
 
-import 'package:customer_portal/config/routes.dart';
-import 'package:customer_portal/contact/contactUs.dart';
-import 'package:customer_portal/coupon/couponListPage.dart';
-import 'package:customer_portal/custodyDetails/custodyDetails.dart';
-import 'package:customer_portal/login/loginScreen.dart';
-import 'package:customer_portal/login/registeration.dart';
-import 'package:customer_portal/outstanding/outstanding.dart';
-import 'package:customer_portal/profile/profile.dart';
-import 'package:customer_portal/sales/salesList.dart';
-import 'package:customer_portal/settings/setting.dart';
 import 'package:customer_portal/splash/splashScreen.dart';
 import 'package:customer_portal/viewModels/notification_provider.dart';
-import 'package:customer_portal/viewModels/registeration_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:provider/provider.dart';
@@ -99,6 +89,7 @@ void setUserInformation(String username, String userId) {
 }
 
 void main() async {
+
   debugProfileBuildsEnabled = true;
   WidgetsFlutterBinding.ensureInitialized();
   initLogs(); // Use initLogs directly without FlutterLogs prefix
@@ -118,6 +109,7 @@ void main() async {
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
   setUserInformation('Jissa', '0001');
+  // SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop', true);
 
   runApp(
     MultiProvider(

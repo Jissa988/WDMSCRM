@@ -3,10 +3,7 @@ import 'package:customer_portal/contact/contactUs.dart';
 import 'package:customer_portal/home/homePage.dart';
 import 'package:customer_portal/profile/profile.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
-import '../config/routes.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../settings/setting.dart';
 
 class BottomNavigationMenu extends StatefulWidget {
@@ -27,7 +24,7 @@ class _BottomNavigationMenuState extends State<BottomNavigationMenu> {
     _menuIndex = widget.menuIndex;
   }
 
-  void _onMenuItemTapped(int index) {
+  Future<void> _onMenuItemTapped(int index) async {
     setState(() {
       _menuIndex = index;
     });
@@ -44,15 +41,14 @@ class _BottomNavigationMenuState extends State<BottomNavigationMenu> {
         // Navigator.pushNamed(context, CustomerPortalRoutes.profile);
         break;
       case 1:
-      // Navigate to Profile screen
-      // Replace 'ProfileScreen()' with your actual screen widget
-      //   Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //           builder: (context) => ProfileScreen()));
+    // String url = 'https://altaybawater.com/';
+    final Uri _url = Uri.parse('https://altaybawater.com/');
 
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
 
-        break;
+    break;
       case 2:
       // Navigate to Home screen
       // Replace 'HomeScreen()' with your actual screen widget
@@ -146,7 +142,7 @@ class _BottomNavigationMenuState extends State<BottomNavigationMenu> {
                   title,
                   style: TextStyle(
                     fontFamily: 'Metropolis',
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: colorByIndex(context, index),
                   ),

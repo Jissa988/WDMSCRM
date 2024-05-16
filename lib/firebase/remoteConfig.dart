@@ -29,6 +29,13 @@ class RemoteConfigService {
 
       print('api_path------: $api_path');
       print('api_path_image------: $api_path_image');
+      String qcapi_path_wdms = _remoteConfig.getString('QCAPI_WDMS');
+      String qcapi_path = _remoteConfig.getString('QCAPI_PATH');
+      String qcapi_path_image = _remoteConfig.getString('QCAPI_IMAGE');
+      print('qcapi_path_wdms------: $qcapi_path_wdms');
+
+      print('qcapi_path------: $qcapi_path');
+      print('qcapi_path_image------: $qcapi_path_image');
 
 
     } catch (e) {
@@ -36,11 +43,27 @@ class RemoteConfigService {
     }
   }
 
-  String getBaseUrl() {
-    print('api_path--1----: ${_remoteConfig.getString('API_PATH')}');
+  String getQCBaseUrl() {
+    print('api_path--1----: ${_remoteConfig.getString('QCAPI_PATH')}');
 
-    return _remoteConfig.getString('API_PATH');
+    return _remoteConfig.getString('QCAPI_PATH');
   }
+   String getQCBaseUrlWdms() {
+     print('api_path_wdms---1---: ${_remoteConfig.getString('QCAPI_WDMS')}');
+
+     return _remoteConfig.getString('QCAPI_WDMS');
+   }
+   String getQCBaseUrlImageUpload() {
+     print('api_path_image---1---: ${_remoteConfig.getString('QCAPI_IMAGE')}');
+
+     return _remoteConfig.getString('QCAPI_IMAGE');
+   }
+
+   String getBaseUrl() {
+     print('api_path--1----: ${_remoteConfig.getString('API_PATH')}');
+
+     return _remoteConfig.getString('API_PATH');
+   }
    String getBaseUrlWdms() {
      print('api_path_wdms---1---: ${_remoteConfig.getString('API_WDMS')}');
 
@@ -51,7 +74,5 @@ class RemoteConfigService {
 
      return _remoteConfig.getString('API_IMAGE');
    }
-
-
 
 }

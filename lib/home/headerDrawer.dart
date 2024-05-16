@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:customer_portal/contact/contactUs.dart';
 import 'package:customer_portal/profile/profile_pic.dart';
 import 'package:flutter/material.dart';
@@ -8,17 +11,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/themes.dart';
 import '../constant/constants.dart';
+import '../customised/quickAlerts/quickAlertDialogue.dart';
+import '../customised/quickAlerts/quickAlertType.dart';
 import '../login/loginScreen.dart';
 import '../profile/profile.dart';
 import '../settings/setting.dart';
+import '../viewModels/profile_provider.dart';
 import '../viewModels/registeration_provider.dart';
 import 'drawerNavItem.dart';
 
 class MyHeaderDrawer extends StatefulWidget {
+  final String fileName,customerName; // Define fileName parameter
+
+  // Constructor to initialize fileName
+  MyHeaderDrawer({required this.fileName,required this.customerName});
+
   @override
   _MyHeaderDrawerState createState() => _MyHeaderDrawerState();
 }
-
 class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
   void initState() {
     super.initState();
@@ -26,8 +36,7 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    var _theme = CustomerPortalTheme.of(context);
-
+    print("getImage--" + widget.fileName);
     return Drawer(
       backgroundColor: Colors.white,
       child: Column(
@@ -41,14 +50,24 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CircleAvatar(
-                      backgroundImage:
-                          // _imageFile != null
-                          // ? FileImage(
-                          // File(_imageFile!.path),
-                          // ) as ImageProvider<Object>
-                          //     :
-                          AssetImage("assets/profile/Profile_Image.png"),
+                    FutureBuilder<Uint8List?>(
+                      future: getImage(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else {
+                          if (snapshot.hasError || snapshot.data == null) {
+                            return CircleAvatar(
+                              backgroundImage: AssetImage("assets/profile/Profile_Image.png"),
+                            );
+                          } else {
+                            Uint8List? imageData = snapshot.data;
+                            return CircleAvatar(
+                              backgroundImage: MemoryImage(imageData!),
+                            );
+                          }
+                        }
+                      },
                     ),
                     SizedBox(width: 10),
                     Expanded(
@@ -58,7 +77,12 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
                         children: [
                           Text(
                             "Welcome,",
-                            style: _theme.textTheme.headline2,
+                            style:  TextStyle(
+                              fontFamily: 'Metropolis',
+                              fontSize: 18 ,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.black,
+                            ),
                           ),
                         ],
                       ),
@@ -78,8 +102,13 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
                   height: 10,
                 ),
                 Text(
-                  "Hamdan bin Mohammed Al Muktoum",
-                  style: _theme.textTheme.headline1,
+                  "${widget.customerName}",
+                  style:  TextStyle(
+                    fontFamily: 'Metropolis',
+                    fontSize: 20 ,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
                 ),
               ],
             ),
@@ -88,7 +117,7 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
             iconData: Icons.arrow_forward_ios_rounded,
             imagePath: 'assets/bottom_menu/profile_trans.png',
             navItemTitle: "Profile",
-            theme: _theme,
+
             callback: () {
               // Navigator.of(context).pushReplacementNamed(
               //   RouteConstants.homeScreen,
@@ -102,7 +131,7 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
             iconData: Icons.arrow_forward_ios_rounded,
             imagePath: 'assets/bottom_menu/aboutUs_trans.png',
             navItemTitle: "About Us",
-            theme: _theme,
+
             callback: () {
               // Navigator.of(context).pushReplacementNamed(
               //   RouteConstants.homeScreen,
@@ -114,7 +143,7 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
             iconData: Icons.arrow_forward_ios_rounded,
             imagePath: 'assets/bottom_menu/setting_trans.png',
             navItemTitle: "Settings",
-            theme: _theme,
+
             callback: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Setting()));
@@ -125,7 +154,7 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
             iconData: Icons.arrow_forward_ios_rounded,
             imagePath: 'assets/bottom_menu/contact_trans.png',
             navItemTitle: "Contact Us",
-            theme: _theme,
+
             callback: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ContactUs()));
@@ -136,7 +165,7 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
             iconData: Icons.arrow_forward_ios_rounded,
             imagePath: 'assets/bottom_menu/logout_trans.png',
             navItemTitle: "Logout",
-            theme: _theme,
+
             callback: () {
               Navigator.pop(context); // Dismiss the drawer
 
@@ -150,13 +179,62 @@ class _MyHeaderDrawerState extends State<MyHeaderDrawer> {
               );
             },
           ),
+
+
         ],
       ),
     );
+
   }
+
+
+  Future<Uint8List?> getImage() async {
+
+    if (widget.fileName == null) {
+      print("widget.fileName is null");
+      return null;
+    }
+
+    print("getImage11--" + widget.fileName);
+
+    try {
+      print("getImage12--" + widget.fileName);
+      ProfileProvider profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+
+      await profileProvider.imageView(widget.fileName);
+      print("stringstatus--" + profileProvider.stringstatus);
+      print("message--" + profileProvider.msg);
+
+      if (profileProvider.stringstatus == 'Success') {
+        String base64String = profileProvider.msg;
+        return base64Decode(base64String);
+      } else {
+        print("message--" + profileProvider.msg);
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text(
+        //       "${profileProvider.msg}",
+        //       style: TextStyle(fontFamily: 'Metropolis'),
+        //     ),
+        //     duration: Duration(seconds: 2),
+        //     backgroundColor: Colors.red[700],
+        //   ),
+        // );
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching image: $e');
+      return null;
+    }
+  }
+
 }
 
-class AlertLogout extends StatelessWidget {
+
+
+
+
+  class AlertLogout extends StatelessWidget {
   final BuildContext scaffoldContext;
   final NavigatorState navigator;
 
@@ -203,14 +281,15 @@ class _AlertLogoutState extends State<_AlertLogout> {
 
   @override
   Widget build(BuildContext context) {
+
     return AlertDialog(
-      title: Text(
-        'Logout',
-        style: TextStyle(
-            fontFamily: 'Metropolis',
-            color: AppColors.black,
-            fontWeight: FontWeight.bold),
+titlePadding: EdgeInsets.all(0),
+      title: Image.asset(
+        'assets/quickAlerts/confirm.gif',
+        // width: 500,
+        // height: 100,
       ),
+    
       content: SingleChildScrollView(
         child: ListBody(
           children: <Widget>[
@@ -327,3 +406,35 @@ class _AlertLogoutState extends State<_AlertLogout> {
     }
   }
 }
+// QuickAlert.show(
+// width: 10,
+// height:5,
+// onCancelBtnTap: () {
+// Navigator.pop(context); // Navigate back to the previous screen
+// },
+// onConfirmBtnTap: (){
+// Navigator.pop(context);
+// handleLogout();
+// },
+// context: context,
+// type: QuickAlertType.confirm,
+// text: 'Do you want to logout',
+// titleAlignment: TextAlign.center,
+// textAlignment: TextAlign.center,
+// confirmBtnText: 'Yes',
+// cancelBtnText: 'No',
+// confirmBtnColor: AppColors.theme_color,
+// backgroundColor: AppColors.white,
+// headerBackgroundColor: Colors.grey,
+// confirmBtnTextStyle: const TextStyle(
+// color: AppColors.white,
+// fontWeight: FontWeight.bold,
+// ),
+// barrierColor: AppColors.theme_color.withOpacity(0.1),
+// titleColor: AppColors.black,
+// textColor: AppColors.black,
+// cancelBtnTextStyle: const TextStyle(
+// color: AppColors.white
+//
+// )
+// );

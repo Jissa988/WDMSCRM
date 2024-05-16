@@ -75,7 +75,7 @@ class BottleDetails extends StatelessWidget {
                 cells: [
                   DataCell(
                     Text(
-                      item.refNo,
+                      item.docNo,
                       style: TextStyle(
                         fontSize: 15,
                         fontFamily: 'Metropolis',
@@ -85,7 +85,18 @@ class BottleDetails extends StatelessWidget {
                   ),
                   DataCell(
                     Text(
-                      item.refDateTime.toString(),
+                      item.docDate.toString(),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontFamily: 'Metropolis',
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+
+                  DataCell(
+                    Text(
+                      item.trxType.toString() == "Issue" ? item.qty.toString() : "0",
                       style: TextStyle(
                         fontSize: 15,
                         fontFamily: 'Metropolis',
@@ -95,17 +106,7 @@ class BottleDetails extends StatelessWidget {
                   ),
                   DataCell(
                     Text(
-                      item.bottleType.toString()=="Deposit"?item.qty.toString():"0",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: 'Metropolis',
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Text(
-                      item.bottleType.toString()=="Custody"?item.qty.toString():"0",
+                      item.trxType.toString() == "Return" ? item.qty.toString() : "0",
                       style: TextStyle(
                         fontSize: 15,
                         fontFamily: 'Metropolis',

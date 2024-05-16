@@ -1,36 +1,25 @@
 class Materials {
   final int slno;
-  final itemId;
   final String itemName;
   final String docNo;
-  final String materialIssueDate;
   final String docDate;
-  final String ownership;
-  final int qty;
-  final String unit;
-  final double price;
+  final String bottleType;
+  final String trxType;
   final double amount;
-  final double vat;
-  final double totalAmount;
-  final String returned;
-  final int strxheadId;
+
+  final double qty;
+final String createdOn;
 
   Materials(
       this.slno,
-      this.itemId,
       this.itemName,
       this.docNo,
-      this.materialIssueDate,
       this.docDate,
-      this.ownership,
-      this.qty,
-      this.unit,
-      this.price,
+      this.bottleType,
+      this.trxType,
       this.amount,
-      this.vat,
-      this.totalAmount,
-      this.returned,
-      this.strxheadId
+      this.qty,
+      this.createdOn
       );
 }
 

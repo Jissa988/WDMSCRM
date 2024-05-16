@@ -90,7 +90,9 @@ class _ProfileEditState extends State<_ProfileEdit> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async => false,
+    child: Scaffold(
       appBar: AppBar(
         title: const Text("Profile Edit"),
         leading: GestureDetector(
@@ -141,6 +143,7 @@ class _ProfileEditState extends State<_ProfileEdit> {
             ProfileMenu(
               textEditingController:
                   TextEditingController(text: "${_displayname.text}"),
+              type:'S',
               icon: "assets/home/user.png",
               isobstruct: false,
               placeholder: MyStrings.errorDisplayName,
@@ -154,6 +157,7 @@ class _ProfileEditState extends State<_ProfileEdit> {
               textEditingController: TextEditingController(
                 text: "${_contactNoController.text }",
               ),
+              type:'N',
               icon: "assets/profile/telephone.png",
               isobstruct: false,
               placeholder: MyStrings.errorContactNo,
@@ -165,9 +169,12 @@ class _ProfileEditState extends State<_ProfileEdit> {
             ),
             ProfileMenu(
               textEditingController:
-                  TextEditingController(text: "${_whatsappNo.text}"),
+                  TextEditingController(text: "${_whatsappNo.text}",
+                  ),
+              type:'N',
               icon: "assets/profile/whatsapp.png",
               isobstruct: false,
+
               placeholder: MyStrings.errorWhatsappNo,
               onChanged: (value) {
                 // Handle the edited data here
@@ -178,6 +185,7 @@ class _ProfileEditState extends State<_ProfileEdit> {
             ProfileMenu(
               textEditingController:
                   TextEditingController(text: "${_mailId.text}"),
+              type:'S',
               icon: "assets/profile/email.png",
               isobstruct: false,
               placeholder: MyStrings.errorEmail,
@@ -190,6 +198,8 @@ class _ProfileEditState extends State<_ProfileEdit> {
             ProfileMenu(
               textEditingController:
                   TextEditingController(text: "${_usernameController.text}"),
+              type:'S',
+
               icon: "assets/profile/username.png",
               isobstruct: false,
               placeholder: MyStrings.errorUsername,
@@ -202,6 +212,7 @@ class _ProfileEditState extends State<_ProfileEdit> {
             ProfileMenu(
               textEditingController:
                   TextEditingController(text: "${_passwordController.text}"),
+              type:'S',
               icon: "assets/profile/password.png",
               isobstruct: true,
               placeholder: MyStrings.errorPassword,
@@ -298,6 +309,6 @@ class _ProfileEditState extends State<_ProfileEdit> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

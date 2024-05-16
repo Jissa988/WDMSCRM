@@ -68,28 +68,15 @@ class _CouponListPageState extends State<_CouponListPage> {
     super.dispose();
   }
 
-  // final List<List<dynamic>> coupons = [
-  //   ['5201', true, true, '6', 'Coupon Book Name'],
-  //   ['5202', true, false, '6', 'Coupon Book Name'],
-  //   ['5203', false, false, '6', 'Coupon Book Name'],
-  //   ['5204', false, true, '6', 'Coupon Book Name'],
-  //   ['5205', false, true, '6', 'Coupon Book Name'],
-  // ];
-
-  // Maintain a list to track the selected state of each coupon
-  // List<bool> selectedCoupons = [];
-  //
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Initialize the selectedCoupons list in initState
-  //   selectedCoupons = List<bool>.generate(coupons.length, (index) => false);
-  // }
 
   @override
   Widget build(BuildContext context) {
-    var _theme = CustomerPortalTheme.of(context);
-    return Scaffold(
+    // var _theme = CustomerPortalTheme.of(context);
+    return  WillPopScope(
+        onWillPop: () async => false,
+    child:
+      Scaffold(
+        backgroundColor: AppColors.white,
       appBar: AppBar(
         backgroundColor: AppColors.white,
         leading: GestureDetector(
@@ -128,140 +115,220 @@ class _CouponListPageState extends State<_CouponListPage> {
               ),
             );
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            // Add return statement here
-            return couponProvider.coupons.isNotEmpty
-                ?Container(
-              color: AppColors.background.withOpacity(0.01),
-              child: ListView.separated(
-                itemCount: couponProvider.coupons.length,
-                separatorBuilder: (context, index) => SizedBox(height: 0.0), // Adjust the height of the separator as needed
-                itemBuilder: (context, index) {
-                  Coupons coupon = couponProvider.coupons[index];
-                  bool shouldChangeColor = coupon.utilizedStatus == "Not Utilized" ? false : true;
-                  bool isPaid = coupon.couponStatus == "Paid" ? true : false;
-
-                  // Check if the current coupon's series number is different from the previous one
-                  bool isNewSeries = index == 0 || coupon.seriesNo != couponProvider.coupons[index - 1].seriesNo;
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            if (snapshot.error.toString().contains('Network is unreachable')) {
+              return Container(
+                color: AppColors.white,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Display the series number if it's a new series
-                      if (isNewSeries)
-                      Container(margin: EdgeInsets.only(left: 20,top:10,bottom: 10),
-                        child:Text(
-                        '${coupon.book} : ${coupon.seriesNo} ( ${coupon.amount} AED )',
+                      Padding(padding: EdgeInsets.only(right: 25,left: 25,bottom:15 ),child:
+                      Image.asset(
+                        'assets/quickAlerts/lightbulb.gif',
+                        // width: 500,
+                        // height: 100,
+                      ),
+                      ),
+                      Flexible(child:
+                      Padding(padding: EdgeInsets.all(10.0), child:
+                      Text(
+                        'Network is unreachable ,Please check your internet connection',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 20,
                           fontFamily: 'Metropolis',
                           color: AppColors.theme_color,
                           fontWeight: FontWeight.bold,
                         ),
-                      ),
-                  ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                        child: CouponCard(
-                          width: double.infinity,
-                          height: 100,
-                          borderRadius: 12,
-                          curveRadius: 20,
-                          curvePosition: 100,
-                          curveAxis: Axis.vertical,
-                          clockwise: false,
-                          backgroundColor: AppColors.white,
-                          shadow: BoxShadow(
-                            color: AppColors.theme_color,
-                          ),
-                          border: BorderSide(
-                            width: 1,
-                            color: Colors.grey.withOpacity(0.4),
-                          ),
-                          firstChild: FirstChildWidget(
-                            theme: _theme,
-                            couponSerialno: coupon.serialNo,
-                            couponPrice: coupon.leafletPrice,
-                          ),
-                          secondChild: shouldChangeColor
-                              ? SecondChildWithBlur(
-                              theme: _theme,
-                              couponSerialno: coupon.serialNo,
-                              couponPrice: coupon.leafletPrice,
-                              couponName: coupon.book,
-                              isPaid: isPaid,
-                              shouldChangeColor: shouldChangeColor)
-                              : SecondChildWithOutBlur(
-                              theme: _theme,
-                              couponSerialno: coupon.seriesNo,
-                              couponPrice: coupon.leafletPrice,
-                              couponName: coupon.book,
-                              isPaid: isPaid,
-                              shouldChangeColor: shouldChangeColor),
-                        ),
+                      ),  )
                       ),
                     ],
-                  );
-                },
-              ),
-            )
+                  ),
+                ),);
+            }
+            return Text('Error: ${snapshot.error}');
+          } else {
+            // Add return statement here
+            return couponProvider.coupons.isNotEmpty
+                ? Container(
+                    color: AppColors.background.withOpacity(0.01),
+                    child: ListView.separated(
+                      itemCount: couponProvider.coupons.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 0.0),
+                      // Adjust the height of the separator as needed
+                      itemBuilder: (context, index) {
+                        Coupons coupon = couponProvider.coupons[index];
+                        bool shouldChangeColor =
+                            coupon.utilizedStatus == "Not Utilized"
+                                ? false
+                                : true;
+                        bool isPaid =
+                            coupon.couponStatus == "Paid" ? true : false;
 
-                : Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(10),
-                        right: Radius.circular(10),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Card(
-                        color: AppColors.white,
-                        elevation: 2,
-                        shadowColor: AppColors.theme_color,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            10,
-                          ),
-                        ),
-                        child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 5,
-                              horizontal: 16,
-                            ),
-                            // minLeadingWidth: task.isDone ? 0 : 2,
-                            title: Center(
-                              child: Text(
-                                'Data Not Found',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Metropolis',
-                                  color: AppColors.theme_color,
-                                  fontWeight: FontWeight.bold,
+                        // Check if the current coupon's series number is different from the previous one
+                        bool isNewSeries = index == 0 ||
+                            coupon.seriesNo !=
+                                couponProvider.coupons[index - 1].seriesNo;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Display the series number if it's a new series
+                            if (isNewSeries)
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 20, top: 10, bottom: 10),
+                                child: Text(
+                                  '${coupon.book} : ${coupon.seriesNo} ( ${coupon.amount} AED )',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Metropolis',
+                                    color: AppColors.theme_color,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            )),
-                      ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
+                              child: CouponCard(
+                                width: double.infinity,
+                                height: 100,
+                                borderRadius: 12,
+                                curveRadius: 20,
+                                curvePosition: 100,
+                                curveAxis: Axis.vertical,
+                                clockwise: false,
+                                backgroundColor: AppColors.white,
+                                shadow: BoxShadow(
+                                  color: AppColors.theme_color,
+                                ),
+                                border: BorderSide(
+                                  width: 1,
+                                  color: Colors.grey.withOpacity(0.4),
+                                ),
+                                firstChild: shouldChangeColor
+                                    ? FirstChildWidgetWithBlur(
+
+                                        couponSerialno: coupon.serialNo,
+                                        couponPrice: coupon.leafletPrice,
+                                      )
+                                    : FirstChildWidgetWithOutBlur(
+                                        couponSerialno: coupon.serialNo,
+                                        couponPrice: coupon.leafletPrice,
+                                      ),
+                                secondChild: shouldChangeColor
+                                    ? SecondChildWithBlur(
+
+                                        couponSerialno: coupon.serialNo,
+                                        couponPrice: coupon.leafletPrice,
+                                        couponName: coupon.book,
+                                        isPaid: isPaid,
+                                        shouldChangeColor: shouldChangeColor)
+                                    : SecondChildWithOutBlur(
+
+                                        couponSerialno: coupon.serialNo,
+                                        couponPrice: coupon.leafletPrice,
+                                        couponName: coupon.book,
+                                        isPaid: isPaid,
+                                        shouldChangeColor: shouldChangeColor),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                  );
+                  )
+                :
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(padding: EdgeInsets.only(right: 25,left: 25,bottom:15 ),child:
+                  Image.asset(
+                    'assets/quickAlerts/lightbulb.gif',
+                    // width: 500,
+                    // height: 100,
+                  ),
+                  ),
+                  Text(
+                    'Data Not Found',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Metropolis',
+                      color: AppColors.theme_color,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
         },
+      ),
+    ));
+  }
+}
+
+class FirstChildWidgetWithBlur extends StatelessWidget {
+
+  final String couponSerialno;
+  final double couponPrice;
+
+  const FirstChildWidgetWithBlur({
+    Key? key,
+
+    required this.couponSerialno,
+    required this.couponPrice,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ImageFiltered(
+      imageFilter: ImageFilter.blur(sigmaX: 0.2, sigmaY: 1.0),
+      // Adjust blur values as needed
+      child: Container(
+        color: AppColors.theme_color.withOpacity(0.2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'S/N: $couponSerialno',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Metropolis',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.white,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              '$couponPrice AED',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.white,
+                fontSize: 13,
+                fontFamily: 'Metropolis',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class FirstChildWidget extends StatelessWidget {
-  final ThemeData theme;
+class FirstChildWidgetWithOutBlur extends StatelessWidget {
+
   final String couponSerialno;
   final double couponPrice;
 
-  const FirstChildWidget({
+  const FirstChildWidgetWithOutBlur({
     Key? key,
-    required this.theme,
+
     required this.couponSerialno,
     required this.couponPrice,
   }) : super(key: key);
@@ -279,7 +346,7 @@ class FirstChildWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Metropolis',
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color: AppColors.white,
             ),
@@ -290,7 +357,7 @@ class FirstChildWidget extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.white,
-              fontSize: 15,
+              fontSize: 13,
               fontFamily: 'Metropolis',
               fontWeight: FontWeight.bold,
             ),
@@ -302,7 +369,7 @@ class FirstChildWidget extends StatelessWidget {
 }
 
 class SecondChildWithBlur extends StatelessWidget {
-  final ThemeData theme;
+
   final String couponSerialno;
   final double couponPrice;
   final String couponName;
@@ -311,7 +378,7 @@ class SecondChildWithBlur extends StatelessWidget {
 
   const SecondChildWithBlur(
       {Key? key,
-      required this.theme,
+
       required this.couponSerialno,
       required this.couponPrice,
       required this.couponName,
@@ -322,8 +389,9 @@ class SecondChildWithBlur extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ImageFiltered(
-      imageFilter: ImageFilter.blur(sigmaX: 0.2, sigmaY: 1.0),
+      imageFilter: ImageFilter.blur(sigmaX: 0.4, sigmaY: 1.0),
       child: Container(
+        color: AppColors.theme_color.withOpacity(0.1),
         width: double.infinity, // Make the container full width
         height: double.infinity, // Make the container full height
         child: Stack(
@@ -335,9 +403,10 @@ class SecondChildWithBlur extends StatelessWidget {
                   // Center the Row horizontally
                   children: [
                     Image.asset(
-                      'assets/coupon/bottle.jpg',
+                      'assets/coupon/bottle.png',
                       width: 75,
                       height: 75,
+
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -346,8 +415,8 @@ class SecondChildWithBlur extends StatelessWidget {
                         Text(
                           couponName,
                           style: TextStyle(
-                            color: AppColors.black,
-                            fontSize: 15,
+                            color: AppColors.lightGray,
+                            fontSize: 13,
                             fontFamily: 'Metropolis',
                             fontWeight: FontWeight.bold,
                           ),
@@ -356,18 +425,18 @@ class SecondChildWithBlur extends StatelessWidget {
                         Text(
                           'S/N: $couponSerialno',
                           style: TextStyle(
-                            color: AppColors.black,
-                            fontSize: 15,
+                            color: AppColors.lightGray,
+                            fontSize: 13,
                             fontFamily: 'Metropolis',
                             fontWeight: FontWeight.bold,
                           ),
                         ),
 
                         Text(
-                          '$couponPrice AED',
+                          isPaid ? '$couponPrice AED' :  '',
                           style: TextStyle(
-                            color: AppColors.black,
-                            fontSize: 15,
+                            color: AppColors.lightGray,
+                            fontSize: 13,
                             fontFamily: 'Metropolis',
                             fontWeight: FontWeight.bold,
                           ),
@@ -387,8 +456,8 @@ class SecondChildWithBlur extends StatelessWidget {
               child: Text(
                 isPaid ? '' : '  Free Coupon',
                 style: TextStyle(
-                  color: AppColors.white,
-                  fontSize: 12,
+                  color: AppColors.lightGray,
+                  fontSize: 10,
                   backgroundColor: AppColors.redish_brown,
                   fontFamily: 'Metropolis',
                   fontWeight: FontWeight.bold,
@@ -402,7 +471,7 @@ class SecondChildWithBlur extends StatelessWidget {
                 shouldChangeColor ? 'Utilized' : '',
                 style: TextStyle(
                     color: AppColors.lightGray,
-                    fontSize: 12,
+                    fontSize: 10,
                     fontFamily: 'Metropolis',
                     fontWeight: FontWeight.w900,
                     fontStyle: FontStyle.italic),
@@ -416,7 +485,7 @@ class SecondChildWithBlur extends StatelessWidget {
 }
 
 class SecondChildWithOutBlur extends StatelessWidget {
-  final ThemeData theme;
+
   final String couponSerialno;
   final double couponPrice;
   final String couponName;
@@ -425,7 +494,7 @@ class SecondChildWithOutBlur extends StatelessWidget {
 
   const SecondChildWithOutBlur(
       {Key? key,
-      required this.theme,
+
       required this.couponSerialno,
       required this.couponPrice,
       required this.couponName,
@@ -448,7 +517,7 @@ class SecondChildWithOutBlur extends StatelessWidget {
                   // Center the Row horizontally
                   children: [
                     Image.asset(
-                      'assets/coupon/bottle.jpg',
+                      'assets/coupon/bottle.png',
                       width: 75,
                       height: 75,
                     ),
@@ -460,7 +529,7 @@ class SecondChildWithOutBlur extends StatelessWidget {
                           couponName,
                           style: TextStyle(
                             color: AppColors.black,
-                            fontSize: 15,
+                            fontSize: 13,
                             fontFamily: 'Metropolis',
                             fontWeight: FontWeight.bold,
                           ),
@@ -469,16 +538,16 @@ class SecondChildWithOutBlur extends StatelessWidget {
                           'S/N: $couponSerialno',
                           style: TextStyle(
                             color: AppColors.black,
-                            fontSize: 15,
+                            fontSize: 13,
                             fontFamily: 'Metropolis',
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          '$couponPrice AED',
+                          isPaid ? '$couponPrice AED' :  '',
                           style: TextStyle(
                             color: AppColors.black,
-                            fontSize: 15,
+                            fontSize: 13,
                             fontFamily: 'Metropolis',
                             fontWeight: FontWeight.bold,
                           ),
@@ -496,7 +565,7 @@ class SecondChildWithOutBlur extends StatelessWidget {
                 isPaid ? '' : '  Free Coupon',
                 style: TextStyle(
                   color: AppColors.white,
-                  fontSize: 12,
+                  fontSize: 10,
                   backgroundColor: AppColors.redish_brown,
                   fontFamily: 'Metropolis',
                   fontWeight: FontWeight.bold,
@@ -510,7 +579,7 @@ class SecondChildWithOutBlur extends StatelessWidget {
                 shouldChangeColor ? 'Utilized' : '',
                 style: TextStyle(
                     color: AppColors.lightGray,
-                    fontSize: 12,
+                    fontSize: 10,
                     fontFamily: 'Metropolis',
                     fontWeight: FontWeight.bold,
                     fontStyle: FontStyle.italic),

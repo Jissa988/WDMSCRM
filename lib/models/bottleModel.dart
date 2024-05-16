@@ -1,17 +1,27 @@
 class Bottles {
 
-  final String refDateTime;
-  final String refNo;
+  final int slno;
+  final String itemName;
+  final String docNo;
+  final String docDate;
   final String bottleType;
-  final double qty;
-  Bottles(
-      this.refDateTime,
-      this.refNo,
-      this.bottleType,
-      this.qty,
+  final String trxType;
+  final double amount;
 
-      );
-}
+  final double qty;
+  final String createdOn;
+
+  Bottles(
+      this.slno,
+      this.itemName,
+      this.docNo,
+      this.docDate,
+      this.bottleType,
+      this.trxType,
+      this.amount,
+      this.qty,
+      this.createdOn
+      );}
 
 class BottlesCounts {
 

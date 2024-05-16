@@ -54,7 +54,8 @@ dependencies:
   image_cropper: ^5.0.0
   image: ^3.0.2
   fluttertoast: ^8.2.4
-
+  popover: ^0.3.0
+  url_launcher: ^6.2.6
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
@@ -115,7 +116,7 @@ flutter:
     - assets/login/top1.png
     - assets/login/top2.png
     - assets/login/login_background.jpg
-    - assets/coupon/bottle.jpg
+    - assets/coupon/bottle.png
     - assets/profile/Profile_Image.png
     - assets/profile/Camera_Icon.svg
     - assets/profile/User Icon.svg
@@ -135,6 +136,13 @@ flutter:
     - assets/profile/username.png
     - assets/profile/password.png
     - assets/profile/credit_limit.png
+    - assets/quickAlerts/confirm.gif
+    - assets/quickAlerts/error.gif
+    - assets/quickAlerts/info.gif
+    - assets/quickAlerts/loading.gif
+    - assets/quickAlerts/success.gif
+    - assets/quickAlerts/warning.gif
+    - assets/quickAlerts/lightbulb.gif
 
 
   # To add assets to your application, add an assets section, like this:

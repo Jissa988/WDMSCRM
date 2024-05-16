@@ -32,7 +32,7 @@ class SalesProvider extends ChangeNotifier {
         }),
 
         data: {
-          "FinYearId": 3,
+          "FinYearId": finyearId,
           "FromDate": fromDate,
           "ToDate": toDate,
           "CustomerId": customerId,
@@ -46,7 +46,8 @@ class SalesProvider extends ChangeNotifier {
       if (response.statusCode == 200) { // Check if the response status code is 200 (OK)
         final List<dynamic> data = response.data['ResultSet'];
         final List<dynamic> data1 = response.data['ResultSet1'];
-
+        logger.i("data--${data}");
+        logger.i("data1--${data1}");
         List<SalesInvoice> _salesInvoice = data.map((item) {
 
 
@@ -138,15 +139,17 @@ List<InvoiceCount> _invoiceCount=data1.map((item){
           return SalesHeadItems(
               item['SaleInvoiceHeadId'] ?? 0,
               item['SaleInvoiceDocNo'] ?? "",
-              item['SaleInvoiceDate'] ?? "",
+              item['Date'] ?? "",
               item['SaleInvoiceTime'] ?? "",
               item['CustomerName'] ?? "",
               item['CustomerId'] ?? 0,
               item['RouteName'] ?? "",
               item['AreaName'] ?? "",
+            item['TotalTaxableAmount'] ?? 0.0,
             item['TotalTaxAmount'] ?? 0.0,
             item['NetAmount'] ?? 0.0,
-            item['TotalDiscountAmount'] ?? 0.0,""
+
+              item['CreatedBy'] ??"",
 
 
           );
@@ -240,9 +243,10 @@ List<InvoiceCount> _invoiceCount=data1.map((item){
             item['CustomerId'] ?? 0,
             item['RouteName'] ?? "",
             item['AreaName'] ?? "",
-              item['TotalDiscountAmount'] ?? 0.0,
+              item['TotalTaxableAmount'] ?? 0.0,
               item['TotalTaxAmount'] ?? 0.0,
-              item['NetAmount'] ?? 0.0,""
+              item['NetAmount'] ?? 0.0,
+            item['CreatedBy'] ??"",
 
 
           );

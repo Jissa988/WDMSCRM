@@ -6,16 +6,21 @@ import 'package:customer_portal/custodyDetails/custodyDetails.dart';
 import 'package:customer_portal/home/bottomNavigation.dart';
 import 'package:customer_portal/sales/salesList.dart';
 import 'package:customer_portal/viewModels/home_provider.dart';
+import 'package:customer_portal/viewModels/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:popover/popover.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/routes.dart';
 import '../constant/constants.dart';
 import '../coupon/couponListPage.dart';
+import '../login/loginScreen.dart';
 import '../outstanding/collectionDetails.dart';
 import '../sales/salesDetails.dart';
 import '../viewModels/notification_provider.dart';
+import '../customised/popUp/customPopup.dart';
+import '../viewModels/registeration_provider.dart';
 import 'greenAnimationWave.dart';
 import 'redanimationWave.dart';
 import 'headerDrawer.dart';
@@ -26,7 +31,8 @@ class HomePage extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => HomeProvider()),
-        // ChangeNotifierProvider(create: (_) => NotificationDataProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => RegisterProvider()),
 
         // Add other providers if needed
       ],
@@ -46,6 +52,7 @@ class _HomePage extends StatefulWidget {
 class _HomeScreenState extends State<_HomePage> {
   final logger = Logger();
   late HomeProvider homeProvider;
+  late RegisterProvider registerProvider;
 
   // late NotificationDataProvider notificationDataProvider;
 
@@ -59,9 +66,9 @@ class _HomeScreenState extends State<_HomePage> {
     super.initState();
     print('initState--');
     homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    registerProvider = Provider.of<RegisterProvider>(context, listen: false);
     // notificationDataProvider = Provider.of<NotificationDataProvider>(context, listen: false);
     getSharedPreference();
-    navigateBasedOnNotificationType();
   }
 
   Future<void> getSharedPreference() async {
@@ -69,6 +76,7 @@ class _HomeScreenState extends State<_HomePage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       setState(() {
         _token = prefs.getString(Constants.API_TOKEN) ?? "";
+        navigateBasedOnNotificationType();
       });
 
       // Do not call _fetchCustomerAccounts here, because the HomeProvider instance is not initialized yet.
@@ -88,7 +96,7 @@ class _HomeScreenState extends State<_HomePage> {
     final notificationDataProvider =
         Provider.of<NotificationDataProvider>(context, listen: false);
     final notificationData = notificationDataProvider.notificationData.data;
-    print('notificationData--build--$notificationData');
+    print('navigateBasedOnNotificationType--build--$notificationData');
     if (notificationData.isNotEmpty) {
       final int notificationId = int.parse(notificationData['NotificationId']);
       print('notificationId-build--$notificationId');
@@ -177,16 +185,30 @@ class _HomeScreenState extends State<_HomePage> {
       appBar: CustomAppBar(
         scaffoldKey: _scaffoldKey,
         homeProvider: homeProvider,
+        registerProvider: registerProvider,
         token: _token,
         selectedCustomerAccount: _selectedCustomerAccount,
         onCustomerAccountChanged: updateSelectedCustomerAccount,
       ),
-      drawer: MyHeaderDrawer(),
+      drawer: Consumer<HomeProvider>(
+        builder: (context, homeProvider, _) {
+          // Your UI code here
+          return MyHeaderDrawer(
+            fileName: homeProvider.homeEmployeeDetails.isNotEmpty
+                ? homeProvider.homeEmployeeDetails[0].fileName ?? ''
+                : '',
+            customerName: homeProvider.homeEmployeeDetails.isNotEmpty
+                ? homeProvider.homeEmployeeDetails[0].customerName ?? ''
+                : '',
+          );
+        },
+      ),
+
       body: BodyContainer(
         homeProvider: homeProvider,
         token: _token,
         selectedCustomerAccount:
-            _selectedCustomerAccount, // Pass the selected customer account to BodyContainer
+        _selectedCustomerAccount, // Pass the selected customer account to BodyContainer
       ),
       bottomNavigationBar: BottomNavigationMenu(2),
     );
@@ -196,6 +218,7 @@ class _HomeScreenState extends State<_HomePage> {
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final HomeProvider homeProvider;
+  final RegisterProvider registerProvider;
 
   String token = "";
   final Function(CustomerAccouts?)
@@ -206,6 +229,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   CustomAppBar({
     required this.scaffoldKey,
     required this.homeProvider,
+    required this.registerProvider,
     required this.token,
     required this.onCustomerAccountChanged,
     this.selectedCustomerAccount,
@@ -216,39 +240,69 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     onCustomerAccountChanged(selectedAccount);
   }
 
-  void showNotificationMenu(
-      BuildContext context, List<UnSeenNotification> items) {
-    List<PopupMenuEntry> menuItems = items.map((item) {
-      return PopupMenuItem(
-        height: 10,
-        padding: EdgeInsets.all(5),
+  void showNotificationMenu(BuildContext context,
+      List<UnSeenNotification> items, Offset targetPosition) {
+    // Build the list of menu items
+    List<PopupMenuEntry<UnSeenNotification>> menuItems = items.map((item) {
+      return PopupMenuItem<UnSeenNotification>(
+        value: item,
         child: ListTile(
-          title: Text('${item.transactionDocNo} - ${item.amount} AED'),
-          onTap: () {
-            handleNotificationTap(context, item);
-          },
+          horizontalTitleGap: 0,
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          title: Text(
+            '${item.transactionDocNo}',
+            style: TextStyle(
+              fontFamily: 'Metropolis',
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
+              color: AppColors.theme_color,
+            ),
+          ),
         ),
       );
     }).toList();
 
-    showMenu(
+    // Show the popup menu anchored to the given position
+    showMenu<UnSeenNotification>(
       context: context,
-      position: RelativeRect.fromLTRB(200, 80, 10, 0),
+      color: AppColors.white,
+      position: RelativeRect.fromLTRB(
+        targetPosition.dx,
+        targetPosition.dy,
+        targetPosition.dx + 1,
+        targetPosition.dy + 1,
+      ),
       items: menuItems,
-    );
+      elevation: 8.0,
+    ).then((selectedItem) {
+      if (selectedItem != null) {
+        // Dismiss the menu
+        handleNotificationTap(context, selectedItem);
+        // Navigator.pop(context);
+      }
+    });
   }
 
   void handleNotificationTap(BuildContext context, UnSeenNotification item) {
     homeProvider.notificationSeenUpdation(token, item.notificationId).then((_) {
+      print("handleNotificationTap---${homeProvider.status}");
+
       if (homeProvider.status == 1) {
         print("handleNotificationTap---${item.notificationType}");
-
-        if (item.notificationType == "CV") {
-          print("handleNotificationTap-1--${item.notificationType}");
-          navigateToCollectionDetails(context, item);
-        } else if (item.notificationType == "SI" || item.notificationType == "DO") {
-          print("handleNotificationTap-2--${item.notificationType}");
-          navigateToSalesDetails(context, item);
+        try {
+          print("handleNotificationTap---try");
+          if (item.notificationType.toString() == "CV") {
+            print("handleNotificationTap-1--${item.notificationType}");
+            navigateToCollectionDetails(context, item);
+          } else if (item.notificationType == "SI" ||
+              item.notificationType == "DO") {
+            print("handleNotificationTap-2--${item.notificationType}");
+            navigateToSalesDetails(context, item);
+          }
+        } catch (e) {
+          print("handleNotificationTap---catch--$e");
         }
       } else {
         print("Error: ${homeProvider.msg}");
@@ -309,7 +363,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         token,
         homeProvider.selected_customerAccounts!.customerId,
       );
-      showNotificationMenu(context, items);
+      RenderBox renderBox = context.findRenderObject() as RenderBox;
+      Offset targetPosition = renderBox.localToGlobal(Offset.zero);
+      // Adjust the target position to align the right edge of the icon
+      targetPosition = Offset(targetPosition.dx + renderBox.size.width,
+          targetPosition.dy + renderBox.size.height);
+
+      // Pass the position to the showNotificationMenu function
+      showNotificationMenu(context, items, targetPosition);
+      // showNotificationMenu(context, items);
     } catch (e) {
       print('Error fetching notifications: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -329,9 +391,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _theme = CustomerPortalTheme.of(context);
     print(
-        'Selected accouts BuildContext=${homeProvider.selected_customerAccounts}');
+        'Selected accouts BuildContext=${homeProvider
+            .selected_customerAccounts}');
 
     return FutureBuilder(
         future: homeProvider.fetchCustomerAccounts(token),
@@ -351,10 +413,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             );
           } else if (snapshot.hasError) {
             // Show error message if fetching data fails
-            return Text('Error: ${snapshot.error}');
+            if (snapshot.error.toString().contains('Network is unreachable')) {
+              return Container(
+                  color: AppColors.white,
+                  child: Center(
+                child: Text(''),),
+              );
+            }
+            // Show generic error message if fetching data fails
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
           } else {
             print(
-                'Selected accouts BuildContext1=${homeProvider.selected_customerAccounts?.customerId}');
+                'Selected accouts BuildContext1=${homeProvider
+                    .selected_customerAccounts?.customerId}');
+
+
 
             if (homeProvider.selected_customerAccounts == null &&
                 _isfirstTime == true) {
@@ -392,15 +467,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       child: DropdownButton<int>(
                         isExpanded: true,
                         value:
-                            homeProvider.selected_customerAccounts?.customerId,
+                        homeProvider.selected_customerAccounts?.customerId,
                         onChanged: (newValue) {
                           // Find the corresponding CustomerAccouts object based on the newValue
                           CustomerAccouts? selectedAccount =
-                              homeProvider.customerAccounts.firstWhere(
-                            (customerAccount) =>
-                                customerAccount.customerId == newValue,
-                            orElse: () => CustomerAccouts(-1,
-                                'Default'), // Default object when no match is found
+                          homeProvider.customerAccounts.firstWhere(
+                                (customerAccount) =>
+                            customerAccount.customerId == newValue,
+                            orElse: () =>
+                                CustomerAccouts(-1,
+                                    'Default'), // Default object when no match is found
                           );
                           homeProvider.selected_customerAccounts =
                               selectedAccount;
@@ -426,32 +502,38 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                             size: 25,
                           ),
                           onPressed: () {
-                            fetchNotificationsAndShowMenu(context);
+                            if (homeProvider.homeEmployeeDetails.isNotEmpty &&
+                                homeProvider.homeEmployeeDetails[0]
+                                    .notificationCount >
+                                    0) {
+                              fetchNotificationsAndShowMenu(context);
+                            }
                           },
                         ),
                         homeProvider.homeEmployeeDetails.isNotEmpty &&
-                                homeProvider.homeEmployeeDetails[0]
-                                        .notificationCount >
-                                    0
+                            homeProvider.homeEmployeeDetails[0]
+                                .notificationCount >
+                                0
                             ? Positioned(
-                                right: 10,
-                                top: 2,
-                                child: Container(
-                                  padding: EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.bs_teal,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Text(
-                                    '${homeProvider.homeEmployeeDetails[0].notificationCount}',
-                                    style: TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              )
+                          right: 10,
+                          top: 2,
+                          child: Container(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColors.bs_teal,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '${homeProvider.homeEmployeeDetails[0]
+                                  .notificationCount}',
+                              style: TextStyle(
+                                color: AppColors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        )
                             : SizedBox(),
                         // Or you can replace `SizedBox()` with `null` if the widget should not be rendered when the condition is not met
                       ],
@@ -460,12 +542,52 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               );
             } else {
+              handleLogout(context);
               return Container();
+
             }
           }
         });
-  }
 
+
+  }
+  Future<void> handleLogout(BuildContext context) async {
+    print("handleLogout--");
+    final logger = Logger();
+
+
+    try {
+      await registerProvider.logout(token).then((_) {
+        print(registerProvider.log_status);
+        print("message--" + registerProvider.msg);
+        if (registerProvider.log_status == 1) {
+          print("message--" + registerProvider.msg);
+
+          SharedPreferences.getInstance().then((prefs) {
+            prefs.remove(Constants.API_TOKEN);
+
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginScreen(),
+
+              ),
+            );
+          });
+        } else {
+          // Show login failure message
+          print("message--" + registerProvider.msg);
+
+
+
+        }
+      });
+    } catch (e) {
+      // Handle errors
+      logger.e("Error logout: $e");
+    }
+  }
   @override
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
@@ -484,7 +606,6 @@ class BodyContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _theme = CustomerPortalTheme.of(context);
     print(
         'home details=selected_customerAccounts${homeProvider.selected_customerAccounts?.customerId}');
 
@@ -504,7 +625,40 @@ class BodyContainer extends StatelessWidget {
               ),
             );
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            if (snapshot.error.toString().contains('Network is unreachable')) {
+               return Container(
+                   color: AppColors.white,
+                child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(padding: EdgeInsets.only(right: 25,left: 25,bottom:15 ),child:
+                    Image.asset(
+                      'assets/quickAlerts/lightbulb.gif',
+                      // width: 500,
+                      // height: 100,
+                    ),
+                    ),
+                    Flexible(child:
+                        Padding(padding: EdgeInsets.all(10.0), child:
+                        Text(
+                          'Network is unreachable ,Please check your internet connection',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'Metropolis',
+                            color: AppColors.theme_color,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),  )
+                   ),
+                  ],
+                ),
+              ),);
+            }
+            // Show generic error message if fetching data fails
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
           } else {
             if (homeProvider.homeEmployeeDetails.isNotEmpty) {
               print(
@@ -621,29 +775,48 @@ class BodyContainer extends StatelessWidget {
                                     Row(
                                       children: [
                                         Image.asset(
-                                            'assets/home/outstanding.png',
-                                            width: constraints.maxWidth * 0.1,
-                                            height: constraints.maxWidth * 0.1,
-                                            color: AppColors.theme_color),
-                                        SizedBox(width: 10),
-                                        Container(
-                                          width: 0.5,
-                                          // Adjust the width of the line
-                                          height: 30,
-                                          // Adjust the height of the line
+                                          'assets/home/outstanding.png',
+                                          width: constraints.maxWidth * 0.1,
+                                          height: constraints.maxWidth * 0.1,
                                           color: AppColors.theme_color,
                                         ),
                                         SizedBox(width: 10),
-                                        Text('Outstanding Amount ',
-                                            style: _theme.textTheme.headline3),
-                                        Spacer(),
-                                        Text(
-                                            '${homeProvider.homeEmployeeDetails[0].totalOutstanding} AED',
-                                            style: _theme.textTheme.bodyText1),
+                                        Container(
+                                          width: 0.5,
+                                          height: 30,
+                                          color: AppColors.theme_color,
+                                        ),
+                                        SizedBox(width: 10),
+                                        Flexible(
+                                          child: Text(
+                                            'Outstanding Amount ',
+                                            style: TextStyle(
+                                              fontFamily: 'Metropolis',
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.black,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              '${homeProvider.homeEmployeeDetails[0].totalOutstanding} AED',
+                                              style: TextStyle(
+                                                fontFamily: 'Metropolis',
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.theme_color,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ],
                                 ),
+
                                 // SizedBox(height: 2),
                                 Divider(
                                   thickness: 0.5,
@@ -655,105 +828,111 @@ class BodyContainer extends StatelessWidget {
 
                                 // This is where you missed the Row widget
                                 Wrap(
+                                  alignment: WrapAlignment.center,
+                                  // Aligns children at the center
                                   children: [
                                     Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          'Last Purchase On  ',
-                                          style: _theme.textTheme.subtitle1,
-                                        ),
-                                        Text(
-                                          '${homeProvider.homeEmployeeDetails[0].lastSaleDateTime}',
-                                          style: _theme.textTheme.headline3,
-                                        ),
-                                        Spacer(),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    SalesList(),
-                                                settings: RouteSettings(
-                                                  arguments: {
-                                                    'homeDetails': homeProvider
-                                                        .homeEmployeeDetails[0]
-                                                  },
-                                                ),
-                                              ),
-                                            );
-
-                                            // Navigator.push(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             SalesList()));
-                                            // print("Navigating to sales route");
-                                            // Navigator.pushNamed(context,
-                                            //     CustomerPortalRoutes.sales);
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.theme_color,
-                                              // Indicator color
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
+                                        Flexible(
+                                          child: Text(
+                                            'Last Purchase On  ',
+                                            style: TextStyle(
+                                              fontFamily: 'Metropolis',
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              fontStyle: FontStyle.italic,
+                                              color: AppColors.lightGray,
                                             ),
-                                            child: Image.asset(
-                                                'assets/home/sales.png',
-                                                width: 20,
-                                                height: 20,
-                                                color: AppColors.white
-                                                // You can adjust width and height as needed
-                                                ),
                                           ),
                                         ),
-                                        SizedBox(
-                                          width: 5,
+                                        Flexible(
+                                          child: Text(
+                                            '${homeProvider.homeEmployeeDetails[0].paymentTerm == 'DO' ? '${homeProvider.homeEmployeeDetails[0].lastDodateTime}' : '${homeProvider.homeEmployeeDetails[0].lastSaleDateTime}'}',
+                                            style: TextStyle(
+                                              fontFamily: 'Metropolis',
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.black,
+                                            ),
+                                          ),
                                         ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    Outstanding(),
-                                                settings: RouteSettings(
-                                                  arguments: {
-                                                    'homeDetails': homeProvider
-                                                        .homeEmployeeDetails[0]
-                                                  },
+                                        Row(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SalesList(),
+                                                    settings: RouteSettings(
+                                                      arguments: {
+                                                        'homeDetails': homeProvider
+                                                            .homeEmployeeDetails[0]
+                                                      },
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.theme_color,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Image.asset(
+                                                  'assets/home/sales.png',
+                                                  width: 20,
+                                                  height: 20,
+                                                  color: AppColors.white,
                                                 ),
                                               ),
-                                            );
-
-                                            // Navigator.pushNamed(context,
-                                            //     CustomerPortalRoutes.outstanding);
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.theme_color,
-                                              // Indicator color
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
                                             ),
-                                            child: Image.asset(
-                                                'assets/home/collection.png',
-                                                width: 20,
-                                                height: 20,
-                                                color: AppColors.white
-                                                // You can adjust width and height as needed
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Outstanding(),
+                                                    settings: RouteSettings(
+                                                      arguments: {
+                                                        'homeDetails': homeProvider
+                                                            .homeEmployeeDetails[0]
+                                                      },
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.theme_color,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
                                                 ),
-                                          ),
+                                                child: Image.asset(
+                                                  'assets/home/collection.png',
+                                                  width: 20,
+                                                  height: 20,
+                                                  color: AppColors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
                                   ],
-                                )
+                                ),
                               ],
                             ),
                           ),
@@ -811,13 +990,26 @@ class BodyContainer extends StatelessWidget {
                                                   children: [
                                                     Text(
                                                       'Custody Details',
-                                                      style: _theme
-                                                          .textTheme.headline3,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Metropolis',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColors.black,
+                                                      ),
                                                     ),
                                                     Text(
                                                       '${homeProvider.homeEmployeeDetails[0].totalCustodyAmount} AED',
-                                                      style: _theme
-                                                          .textTheme.bodyText1,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Metropolis',
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: AppColors
+                                                            .theme_color,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -977,18 +1169,12 @@ class BodyContainer extends StatelessWidget {
                                   child: Container(
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                       children: [
                                         Flexible(
                                           child: Row(
                                             children: [
-                                              // Container(
-                                              //   padding: EdgeInsets.all(8),
-                                              //   decoration: BoxDecoration(
-                                              //     color: AppColors.white,
-                                              //     borderRadius: BorderRadius.circular(4),
-                                              //   ),
-                                              //   child:
+
                                               Image.asset(
                                                   'assets/home/available_coupon.png',
                                                   width: constraints.maxWidth *
@@ -1009,17 +1195,30 @@ class BodyContainer extends StatelessWidget {
                                               Flexible(
                                                 child: Column(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
                                                       'Available Coupon Book',
-                                                      style: _theme
-                                                          .textTheme.headline3,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                        'Metropolis',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                        FontWeight.w500,
+                                                        color: AppColors.black,
+                                                      ),
                                                     ),
                                                     Text(
                                                       '${homeProvider.homeEmployeeDetails[0].totalAvailableCouponCount}',
-                                                      style: _theme
-                                                          .textTheme.bodyText1,
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                        'Metropolis',
+                                                        fontSize: 22,
+                                                        fontWeight:
+                                                        FontWeight.bold,
+                                                        color: AppColors
+                                                            .theme_color,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -1052,7 +1251,7 @@ class BodyContainer extends StatelessWidget {
                                             decoration: BoxDecoration(
                                               color: AppColors.theme_color,
                                               borderRadius:
-                                                  BorderRadius.circular(4),
+                                              BorderRadius.circular(4),
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: AppColors.white,
@@ -1074,23 +1273,23 @@ class BodyContainer extends StatelessWidget {
                                 SizedBox(height: 12),
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     _buildItem(
                                         '${homeProvider.homeEmployeeDetails[0].remainingPaidCouponCount}(${homeProvider.homeEmployeeDetails[0].remainingFreeCouponCount} Free Coupons)',
                                         'assets/home/paidcoupon.png',
-                                        _theme,
                                         'Remaining'),
                                     _buildItem(
                                         '${homeProvider.homeEmployeeDetails[0].utilizedPaidCouponCount}(${homeProvider.homeEmployeeDetails[0].utilizedFreeCouponCount} Free Coupons)',
                                         'assets/home/free_coupon.png',
-                                        _theme,
                                         'Utilized'),
                                   ],
                                 ),
                               ],
                             ),
                           ),
+
+
                           Row(
                             children: [
                               Expanded(
@@ -1164,13 +1363,29 @@ class BodyContainer extends StatelessWidget {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    Text('This Month Paid',
-                                                        style: _theme.textTheme
-                                                            .headline5),
                                                     Text(
-                                                        '${homeProvider.homeEmployeeDetails[0].thisMonthsaleAmount} AED',
-                                                        style: _theme.textTheme
-                                                            .bodyText2),
+                                                      '${homeProvider.homeEmployeeDetails[0].paymentTerm == 'DO' ? 'This Month DO' : 'This Month Paid'}',
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Metropolis',
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColors.black,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${homeProvider.homeEmployeeDetails[0].paymentTerm == 'DO' ? '${homeProvider.homeEmployeeDetails[0].thisMonthDoAmount} AED' : '${homeProvider.homeEmployeeDetails[0].thisMonthsaleAmount} AED'}',
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Metropolis',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColors
+                                                            .theme_color,
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -1272,20 +1487,51 @@ class BodyContainer extends StatelessWidget {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                        'This Month Collection',
-                                                        style: _theme.textTheme
-                                                            .headline5),
+                                                      'This Month Collection',
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Metropolis',
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColors.black,
+                                                      ),
+                                                    ),
                                                     Text(
-                                                        '${homeProvider.homeEmployeeDetails[0].thisMonthCollection} AED',
-                                                        style: _theme.textTheme
-                                                            .bodyText2),
-                                                    Text('Last Collection',
-                                                        style: _theme.textTheme
-                                                            .headline5),
+                                                      '${homeProvider.homeEmployeeDetails[0].thisMonthCollection} AED',
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Metropolis',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColors
+                                                            .theme_color,
+                                                      ),
+                                                    ),
                                                     Text(
-                                                        '${homeProvider.homeEmployeeDetails[0].lastCollectionAmount} AED',
-                                                        style: _theme.textTheme
-                                                            .bodyText2),
+                                                      'Last Collection',
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Metropolis',
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColors.black,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${homeProvider.homeEmployeeDetails[0].lastCollectionAmount} AED',
+                                                      style: TextStyle(
+                                                        fontFamily:
+                                                            'Metropolis',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: AppColors
+                                                            .theme_color,
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -1327,8 +1573,7 @@ class BodyContainer extends StatelessWidget {
   }
 }
 
-Widget _buildItem(
-    String text, String imagePath, ThemeData theme, String label) {
+Widget _buildItem(String text, String imagePath, String label) {
   return Expanded(
     child: Stack(
       children: [
@@ -1366,11 +1611,21 @@ Widget _buildItem(
                     children: [
                       Text(
                         label,
-                        style: theme.textTheme.headline4,
+                        style: TextStyle(
+                          fontFamily: 'Metropolis',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.black,
+                        ),
                       ),
                       Text(
                         'Coupons',
-                        style: theme.textTheme.headline4,
+                        style: TextStyle(
+                          fontFamily: 'Metropolis',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -1391,7 +1646,12 @@ Widget _buildItem(
               SizedBox(height: 10),
               Text(
                 text,
-                style: theme.textTheme.bodyText2,
+                style: TextStyle(
+                  fontFamily: 'Metropolis',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.theme_color,
+                ),
               ),
             ],
           ),
@@ -1417,8 +1677,6 @@ class SaleTimingBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _theme = CustomerPortalTheme.of(context);
-
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -1434,12 +1692,22 @@ class SaleTimingBox extends StatelessWidget {
               Column(children: [
                 Text(
                   title,
-                  style: _theme.textTheme.headline4,
+                  style: TextStyle(
+                    fontFamily: 'Metropolis',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.black,
+                  ),
                 ),
                 if (subtitile != '')
                   Text(
                     subtitile,
-                    style: _theme.textTheme.headline4,
+                    style: TextStyle(
+                      fontFamily: 'Metropolis',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.black,
+                    ),
                   )
               ]),
             ],
@@ -1447,103 +1715,15 @@ class SaleTimingBox extends StatelessWidget {
           SizedBox(height: 4),
           Text(
             amount,
-            style: _theme.textTheme.bodyText2,
+            style: TextStyle(
+              fontFamily: 'Metropolis',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.theme_color,
+            ),
           ),
         ],
       ),
     );
   }
 }
-// List<UnSeenNotification> items =
-//     await homeProvider.fetchUnSeenNotifications(
-// token,
-// homeProvider.selected_customerAccounts!
-//     .customerId);
-//
-// List<PopupMenuEntry> menuItems =
-// items.map((item) {
-// return PopupMenuItem(
-// height: 10,
-// padding: EdgeInsets.all(5),
-// child: ListTile(
-// title: Text(
-// '${item.transactionDocNo} - ${item.amount} AED'),
-// onTap: () {
-//
-// homeProvider.notificationSeenUpdation(token,item.notificationId)
-//     .then((_) {
-// print('status---${homeProvider.status}');
-// print('msg---${homeProvider.msg}');
-//
-// if(homeProvider.status==1){
-// print('items---${item.notificationType}');
-//
-// if (item.notificationType == "CV") {
-// print('notificationheadId-build--CollectionDetails');
-// Navigator.push(
-// context,
-// MaterialPageRoute(
-// builder: (context) => CollectionDetails(),
-// settings: RouteSettings(
-// arguments: {'voucherId': item.transactionHeadId,'finyearId':item.finYearId,'typeId':item.typeid},
-// ),
-// ),
-// );
-// } else if (item.notificationType == "SI") {
-// Navigator.push(
-// context,
-// MaterialPageRoute(
-// builder: (context) => SalesDetails(),
-// settings: RouteSettings(
-// arguments: {
-// 'salesInvoiceId': item.transactionHeadId,
-// 'headType': 'Sale'
-// },
-// ),
-// ),
-// );
-// } else if (item.notificationType == "DO") {
-// Navigator.push(
-// context,
-// MaterialPageRoute(
-// builder: (context) => SalesDetails(),
-// settings: RouteSettings(
-// arguments: {
-// 'salesInvoiceId': item.transactionHeadId,
-// 'headType': 'Do'
-// },
-// ),
-// ),
-// );
-// }
-// }else{
-//
-// print("message--" + homeProvider.msg);
-// ScaffoldMessenger.of(context).showSnackBar(
-// SnackBar(
-// content: Text(
-// "${homeProvider.msg}",
-// style: TextStyle(fontFamily: 'Metropolis'),
-// ),
-// duration: Duration(seconds: 2),
-// backgroundColor: Colors.red[700],
-// ),
-// );
-// }
-//
-// });
-// },
-// ),
-// );
-// }).toList();
-//
-// // Show the menu
-// showMenu(
-// context: context,
-// position: RelativeRect.fromLTRB(200, 80, 10, 0),
-// items: menuItems,
-// );
-// } catch (e) {
-// // Handle errors
-// print('Error: $e');
-// }

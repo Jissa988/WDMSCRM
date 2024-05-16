@@ -86,7 +86,10 @@ class _ProfileScreenState extends State<_ProfileScreen> {
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
-            return Scaffold(
+            return  WillPopScope(
+                onWillPop: () async => false,
+          child:
+              Scaffold(
               appBar: AppBar(
                 title: const Text("Profile", style: TextStyle(
                   color: AppColors.black,
@@ -564,15 +567,6 @@ class _ProfileScreenState extends State<_ProfileScreen> {
                                         ),
                                         Flexible(
                                           child:
-                                          // Text(
-                                          //   "****",
-                                          //   style: TextStyle(
-                                          //     color: AppColors.black,
-                                          //     fontSize: 18,
-                                          //     fontWeight: FontWeight.normal,
-                                          //   ),
-                                          //
-                                          // ),
                                           Text(
                                             '${'*' * profileProvider.profileDetails[0].password!.length}', // Replace each character with an asterisk
                                             style: TextStyle(
@@ -622,234 +616,24 @@ class _ProfileScreenState extends State<_ProfileScreen> {
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),),
-                                      // SizedBox(
-                                      //   width: 10,
-                                      // ),
-                                      // Flexible(
-                                      //   child: Text(
-                                      //     "0",
-                                      //     style: TextStyle(
-                                      //       color: AppColors.black,
-                                      //       fontSize: 18,
-                                      //       fontWeight: FontWeight.normal,
-                                      //     ),
-                                      //   ),
-                                      // ),
+
                                     ],
                                   ),
                                 ),
-                                // Expanded(
-                                //   child: Row(
-                                //     children: [
-                                //       Text('MON', style: TextStyle(
-                                //         color: AppColors.black,
-                                //         fontSize: 18,
-                                //         fontWeight: FontWeight.bold,
-                                //       ),),
-                                //       SizedBox(
-                                //         width: 10,
-                                //       ),
-                                //       Flexible(
-                                //         child: Text(
-                                //           "2",
-                                //           style: TextStyle(
-                                //             color: AppColors.black,
-                                //             fontSize: 18,
-                                //             fontWeight: FontWeight.normal,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
-                                // Expanded(
-                                //   child: Row(
-                                //     children: [
-                                //       Text('TUE', style: TextStyle(
-                                //         color: AppColors.black,
-                                //         fontSize: 18,
-                                //         fontWeight: FontWeight.bold,
-                                //       ),),
-                                //       SizedBox(
-                                //         width: 10,
-                                //       ),
-                                //       Flexible(
-                                //         child: Text(
-                                //           "5",
-                                //           style: TextStyle(
-                                //             color: AppColors.black,
-                                //             fontSize: 18,
-                                //             fontWeight: FontWeight.normal,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
-                                // Expanded(
-                                //   child:
-                                //   Row(
-                                //     children: [
-                                //       Text('WED', style: TextStyle(
-                                //         color: AppColors.black,
-                                //         fontSize: 18,
-                                //         fontWeight: FontWeight.bold,
-                                //       ),),
-                                //       SizedBox(
-                                //         width: 10,
-                                //       ),
-                                //       Flexible(
-                                //         child: Text(
-                                //           "5",
-                                //           style: TextStyle(
-                                //             color: AppColors.black,
-                                //             fontSize: 18,
-                                //             fontWeight: FontWeight.normal,
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
+
                               ],
                             ),
-                            // Row(
-                            //   children: [
-                            //     Expanded(
-                            //       child: Row(
-                            //         children: [
-                            //           Text('THU', style: TextStyle(
-                            //             color: AppColors.black,
-                            //             fontSize: 18,
-                            //             fontWeight: FontWeight.bold,
-                            //           ),),
-                            //           SizedBox(
-                            //             width: 10,
-                            //           ),
-                            //           Flexible(
-                            //             child: Text(
-                            //               "0",
-                            //               style: TextStyle(
-                            //                 color: AppColors.black,
-                            //                 fontSize: 18,
-                            //                 fontWeight: FontWeight.normal,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //     Expanded(
-                            //       child: Row(
-                            //         children: [
-                            //           Text('FRI', style: TextStyle(
-                            //             color: AppColors.black,
-                            //             fontSize: 18,
-                            //             fontWeight: FontWeight.bold,
-                            //           ),),
-                            //           SizedBox(
-                            //             width: 10,
-                            //           ),
-                            //           Flexible(
-                            //             child: Text(
-                            //               "7",
-                            //               style: TextStyle(
-                            //                 color: AppColors.black,
-                            //                 fontSize: 18,
-                            //                 fontWeight: FontWeight.normal,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //     Expanded(
-                            //       child:
-                            //       Row(
-                            //         children: [
-                            //           Text('SAT', style: TextStyle(
-                            //             color: AppColors.black,
-                            //             fontSize: 18,
-                            //             fontWeight: FontWeight.bold,
-                            //           ),),
-                            //           SizedBox(
-                            //             width: 10,
-                            //           ),
-                            //           Flexible(
-                            //             child: Text(
-                            //               "5",
-                            //               style: TextStyle(
-                            //                 color: AppColors.black,
-                            //                 fontSize: 18,
-                            //                 fontWeight: FontWeight.normal,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //     Expanded(
-                            //       child:
-                            //       Row(
-                            //         children: [
-                            //           Text('', style: TextStyle(
-                            //             color: AppColors.black,
-                            //             fontSize: 18,
-                            //             fontWeight: FontWeight.bold,
-                            //           ),),
-                            //           SizedBox(
-                            //             width: 10,
-                            //           ),
-                            //           Flexible(
-                            //             child: Text(
-                            //               "",
-                            //               style: TextStyle(
-                            //                 color: AppColors.black,
-                            //                 fontSize: 18,
-                            //                 fontWeight: FontWeight.normal,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ],
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
+
 
                           ],
                         ),
                       ),
                     ),
-                    // ProfileMenu(
-                    //   text: "My Account",
-                    //   icon: "assets/profile/User Icon.svg",
-                    //   press: () => {},
-                    // ),
-                    // ProfileMenu(
-                    //   text: "Notifications",
-                    //   icon: "assets/profile/Bell.svg",
-                    //   press: () {},
-                    // ),
-                    // ProfileMenu(
-                    //   text: "Settings",
-                    //   icon: "assets/profile/Settings.svg",
-                    //   press: () {},
-                    // ),
-                    // ProfileMenu(
-                    //   text: "Help Center",
-                    //   icon: "assets/profile/Question mark.svg",
-                    //   press: () {},
-                    // ),
-                    // ProfileMenu(
-                    //   text: "Log Out",
-                    //   icon: "assets/profile/Log out.svg",
-                    //   press: () {},
-                    // ),
                   ],
                 ),
               ),
               bottomNavigationBar: BottomNavigationMenu(0),
-            );
+            ));
 
         }
         });

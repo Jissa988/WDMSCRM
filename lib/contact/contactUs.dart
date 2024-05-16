@@ -29,7 +29,32 @@ class ContactUs extends StatelessWidget {
           ),
         ),
       ),
-      // body:
+      body:Container(
+        padding: EdgeInsets.all(10),
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            Text('Mobile NO: +71 xxxxxxx336', style: TextStyle(
+              fontFamily:
+              'Metropolis',
+              fontSize: 16,
+              fontWeight:
+              FontWeight.w500,
+              color: AppColors
+                  .theme_color,
+            ),),
+            Text('MailId: dajla@gmal.com', style: TextStyle(
+              fontFamily:
+              'Metropolis',
+              fontSize: 16,
+              fontWeight:
+              FontWeight.w500,
+              color: AppColors
+                  .theme_color,
+            ),)
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationMenu(3),
     );
   }

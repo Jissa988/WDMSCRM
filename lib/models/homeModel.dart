@@ -29,6 +29,10 @@ class HomeEmployeeDetails{
   double? lastCollectionAmount;
   int notificationCount;
   int finyearId;
+  String filePath;
+  String fileName;
+  String lastDodateTime;
+  double thisMonthDoAmount;
 
   HomeEmployeeDetails(
       this.customerId,
@@ -53,24 +57,29 @@ class HomeEmployeeDetails{
       this.lastCollectionAmount,
 this.notificationCount,
       this.finyearId,
+      this.filePath,
+      this.fileName,
+      this.lastDodateTime,
+      this.thisMonthDoAmount
       );
 }
 
 class UnSeenNotification {
-  final int notificationId;
-  final String notificationType;
-  final int customerId;
-  final int transactionHeadId;
-  final int typeid;
-  final String transactionDocNo;
-  final double amount;
-  final int finYearId;
+  final int? notificationId;
+  final String? notificationType;
+  final int? customerId;
+  final int? transactionHeadId;
+  final int? typeid;
+  final String? transactionDocNo;
+  final double? amount;
+  final int? finYearId;
 
-  UnSeenNotification(this.notificationId,
+  UnSeenNotification(
+      this.notificationId,
       this.notificationType,
+      this.typeid,
       this.customerId,
       this.transactionHeadId,
-      this.typeid,
       this.transactionDocNo,
       this.amount,
       this.finYearId);

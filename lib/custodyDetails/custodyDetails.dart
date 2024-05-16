@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/themes.dart';
 import '../constant/constants.dart';
+import '../customised/quickAlerts/quickAlertDialogue.dart';
+import '../customised/quickAlerts/quickAlertType.dart';
 import '../models/bottleModel.dart';
 import '../models/homeModel.dart';
 import '../models/materialModels.dart';
@@ -75,10 +77,13 @@ class _CustodyDetailsState extends State<_CustodyDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: DefaultTabController(
+    return  WillPopScope(
+      onWillPop: () async => false,
+      child:
+      DefaultTabController(
         length: 2, // Define the number of tabs
         child: Scaffold(
+          backgroundColor: AppColors.white,
           appBar: AppBar(
             flexibleSpace: Container(
               decoration: BoxDecoration(
@@ -114,7 +119,7 @@ class _CustodyDetailsState extends State<_CustodyDetails> {
             bottom: TabBar(
               labelStyle: TextStyle(
                 color: AppColors.white,
-                fontSize: 22,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
               indicatorColor: AppColors.white,
@@ -133,7 +138,10 @@ class _CustodyDetailsState extends State<_CustodyDetails> {
               // Content of Tab 1
               FutureBuilder(
                 future: custodyProvider.getBottleDetails(
-                    _token, widget.customerDetails!.customerId),
+                     _token,
+                  // 3527),
+                     widget.customerDetails!.customerId),
+
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
@@ -147,126 +155,93 @@ class _CustodyDetailsState extends State<_CustodyDetails> {
                       ),
                     );
                   } else if (snapshot.hasError) {
+                    if (snapshot.error.toString().contains('Network is unreachable')) {
+                      return Container(
+                        color: AppColors.white,
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Padding(padding: EdgeInsets.only(right: 25,left: 25,bottom:15 ),child:
+                              Image.asset(
+                                'assets/quickAlerts/lightbulb.gif',
+                                // width: 500,
+                                // height: 100,
+                              ),
+                              ),
+                              Flexible(child:
+                              Padding(padding: EdgeInsets.all(10.0), child:
+                              Text(
+                                'Network is unreachable ,Please check your internet connection',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: 'Metropolis',
+                                  color: AppColors.theme_color,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),  )
+                              ),
+                            ],
+                          ),
+                        ),);
+                    }
                     return Text('Error: ${snapshot.error}');
                   } else {
-                    // Add return statement here
-                    return custodyProvider.bottles.isNotEmpty
-                        ? Container(
-                            child: BottleDetails(
-                              bottles: custodyProvider.bottles,
-                              bottleCount: custodyProvider.bottlesCounts,
+                    if (custodyProvider.bottles.isNotEmpty) {
+                      return Container(
+                        child: BottleDetails(
+                          bottles: custodyProvider.bottles,
+                          bottleCount: custodyProvider.bottlesCounts,
+                        ),
+                      );
+                    } else {
+                      return
+                        Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(padding: EdgeInsets.only(right: 25,left: 25,bottom:15 ),child:
+                            Image.asset(
+                              'assets/quickAlerts/lightbulb.gif',
+                              // width: 500,
+                              // height: 100,
                             ),
-                          )
-                        : Container(
-                            height: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(10),
-                                right: Radius.circular(10),
+                            ),
+                            Text(
+                              'Data Not Found',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: 'Metropolis',
+                                color: AppColors.theme_color,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Card(
-                                color: AppColors.white,
-                                elevation: 2,
-                                shadowColor: AppColors.theme_color,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    10,
-                                  ),
-                                ),
-                                child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5,
-                                      horizontal: 16,
-                                    ),
-                                    // minLeadingWidth: task.isDone ? 0 : 2,
-                                    title: Center(
-                                      child: Text(
-                                        'Data Not Found',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Metropolis',
-                                          color: AppColors.theme_color,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    )),
-                              ),
-                            ),
-                          );
+                          ],
+                        ),
+                      );
+
+
+                    }
                   }
                 },
               ),
-
               // Content of Tab 2
               FutureBuilder(
-                future: custodyProvider.getmaterialDetails(
-                    _token, widget.customerDetails!.customerId),
+                future: Future.delayed(Duration.zero), // Placeholder future
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (custodyProvider.materials.isEmpty) {
+                    // If materials are empty, show a loading indicator
                     return Center(
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: AppColors.theme_color,
-                          strokeWidth: 2,
-                        ),
+                      child: CircularProgressIndicator(
+                        color: AppColors.theme_color,
+                        strokeWidth: 2,
                       ),
                     );
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
                   } else {
-                    // Add return statement here
-                    return custodyProvider.materials.isNotEmpty
-                        ? Container(
-                            child: MaterialDetails(
-                              materials: custodyProvider.materials,
-                            ),
-                          )
-                        : Container(
-                            height: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.horizontal(
-                                left: Radius.circular(10),
-                                right: Radius.circular(10),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Card(
-                                color: AppColors.white,
-                                elevation: 2,
-                                shadowColor: AppColors.theme_color,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    10,
-                                  ),
-                                ),
-                                child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 5,
-                                      horizontal: 16,
-                                    ),
-                                    // minLeadingWidth: task.isDone ? 0 : 2,
-                                    title: Center(
-                                      child: Text(
-                                        'Data Not Found',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'Metropolis',
-                                          color: AppColors.theme_color,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    )),
-                              ),
-                            ),
-                          );
+                    // Render material details widget using custodyProvider.materials
+                    return MaterialDetails(
+                      materials: custodyProvider.materials,
+                    );
                   }
                 },
               ),
